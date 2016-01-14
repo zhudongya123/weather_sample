@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:text="1.1.3版本：\n\n   更新：\n   修复了一些设置选项和桌面小部件的错误。\n   很惭愧，就做了一点微小的更新，谢谢大家。"
+            android:textSize="14sp" >
+        </TextView>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:text="1.1.2版本：\n\n   更新：\n   1.改进了图形界面。\n   2.增强桌面小部件功能。\n   3.提供更多自定义选项。\n   4.更换了数据接口 ，删除了不必要的权限。\n\n   说明：桌面小部件（4*2）现提供三种交互方式，点击时钟即可跳转到谷歌时钟（可修改为其他应用程序），点击回环按钮即可立即刷新天气，点击天气图标即可进入本应用程序。\n   接口改为和风天气，可能显示效果上与之前不同。"
+            android:textSize="14sp" >
+        </TextView>
+
+        <TextView
+            android:id="@+id/help"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:text="1.0版本：\n\n   欢迎使用质感天气。\n   本应用在存在网络连接的环境下(添加城市和更新天气可能产生数据流量费用)可以在添加城市之后查看所添加城市当日及其未来五日的天气，本应用(1.0版本)的数据提供方为数据聚合，理论上支持全国所有县及县级以上城市，包括县级市，县，不包括区，镇。具体支持城市信息可以在聚合数据网站上查询。\n   本应用通过数据聚合SDK开发，所需权限皆为该SDK必须权限。"
+            android:textSize="14sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:text="   本应用最多支持添加到八个城市，并且为了体验的良好性，在超过三个城市以上的情况下，在添加成功之后不会自动跳转到该页面，您可以通过滑动来切换到该城市。"
+            android:textSize="14sp" >
+        </TextView>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:text="   本软件的顶栏(ActionBar)的颜色会随着当前温度的变化而变化，当未连接网络时，将会显示为白色，颜色参照如下。"
+            android:textSize="14sp" >
+        </TextView>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:orientation="horizontal" >
+
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="24dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_weight="1"
+                android:background="@drawable/hot" >
+            </ImageView>
+
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="24dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_weight="1"
+                android:background="@drawable/warm" >
+            </ImageView>
+
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="24dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_weight="1"
+                android:background="@drawable/comfortable" >
+            </ImageView>
+
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="24dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_weight="1"
+                android:background="@drawable/cool" >
+            </ImageView>
+
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="24dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_weight="1"
+                android:background="@drawable/cold" >
+            </ImageView>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="24dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text=">30°"
+                android:textSize="14sp" >
+            </TextView>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="24dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="24°~30°"
+                android:textSize="14sp" >
+            </TextView>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="24dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="16°~24°"
+                android:textSize="14sp" >
+            </TextView>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="24dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="10°~16°"
+                android:textSize="14sp" >
+            </TextView>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="24dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="&lt;10°"
+                android:textSize="14sp" >
+            </TextView>
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:text="   未来五天预报中的温度和曲线颜色也会随着温度的变化而变化，变化的依据为红蓝光谱，同时为了让显示更加清楚，屏蔽了黄色区间和青色区间。\n   导航抽屉中的背景图片也会根据温度变化而自动切换。"
+            android:textSize="14sp" >
+        </TextView>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_weight="1"
+                android:scaleType="centerCrop"
+                android:src="@drawable/high_temper" >
+            </ImageView>
+
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_weight="1"
+                android:scaleType="centerCrop"
+                android:src="@drawable/middle_temper" >
+            </ImageView>
+
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_weight="1"
+                android:scaleType="centerCrop"
+                android:src="@drawable/low_temper" >
+            </ImageView>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="24dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text=">28°"
+                android:textSize="14sp" >
+            </TextView>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="24dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="14°~28°"
+                android:textSize="14sp" >
+            </TextView>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="24dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="&lt;14°"
+                android:textSize="14sp" >
+            </TextView>
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:text="   在未连接网络时，将会显示上一次更新时的天气，同时添加城市和管理城市功能将被禁用。并且此时下拉刷新功能将会失效。"
+            android:textSize="14sp" >
+        </TextView>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:text="   本应用提供两种尺寸的桌面小部件(1*2,2*4)，在第一次添加之后本应用将启动一个后台服务来实时更新天气，您可以在设置选项内设置后台自动同步频率。\n   因为后台服务的不确定性，当桌面小部件停止更新时，您可以通过点击小部件来跳转到应用程序内来更新，或者移除所有小部件重新添加。"
+            android:textSize="14sp" >
+        </TextView>
+    </LinearLayout>
+
+</ScrollView>
