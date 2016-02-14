@@ -1,6 +1,5 @@
 package com.stu.zdy.weather.db;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -14,39 +13,41 @@ import android.util.Log;
 
 import com.stu.zdy.weather_sample.R;
 
-public class DBmanager {
-	private final int BUFFER_SIZE = 400000;
-	public static final String DB_NAME = "data.db"; // æ–‡ä»¶å
-	public static final String PACKAGE_NAME = "com.stu.zdy.weather_sample";// åŒ…å
-	public static final String DB_PATH = "/data" + Environment.getDataDirectory().getAbsolutePath() + "/"
-			+ PACKAGE_NAME; // åº”ç”¨ç¨‹åºç»å¯¹è·¯å¾„
+public class DBManager {
+	private final static int BUFFER_SIZE = 400000;
+	public static final String DB_NAME = "data.db"; // ±£´æµÄÊý¾Ý¿âÎÄ¼þÃû
+	public static final String PACKAGE_NAME = "com.stu.zdy.weather_sample";
+	public static final String DB_PATH = "/data"
+			+ Environment.getDataDirectory().getAbsolutePath() + "/"
+			+ PACKAGE_NAME; // ÔÚÊÖ»úÀï´æ·ÅÊý¾Ý¿âµÄÎ»ÖÃ
 
 	private SQLiteDatabase database;
 	private Context context;
 	private SQLiteDatabase db;
 
-	public DBmanager(Context context) {
+	public DBManager(Context context) {
 		this.context = context;
 	}
 
 	public void openDatabase() {
-		this.database = this.openDatabase(DB_PATH + "/" + DB_NAME);
+//		this.database = this.copyDataBaseFromRaw();
 	}
 
-	private SQLiteDatabase openDatabase(String dbfile) {
+	public static SQLiteDatabase copyDataBaseFromRaw(Context context) {
+		String dbfile = DB_PATH + "/" + DB_NAME;
 		try {
-			if (!(new File(dbfile).exists())) {// å½“æ•°æ®åº“æ–‡ä»¶å­˜åœ¨çš„æ—¶å€™
-				InputStream is = this.context.getResources().openRawResource(R.raw.data); // æžåˆ°æ•°æ®åº“æ–‡ä»¶çš„è¾“å…¥å­—èŠ‚æµï¼ˆä»Žæ–‡ä»¶è¯»ï¼‰
-				FileOutputStream fos = new FileOutputStream(dbfile);// æ–°å»ºä¸€ä¸ªè¾“å‡ºå­—èŠ‚æµï¼ˆå†™åˆ°æ–‡ä»¶ä¸­ï¼‰
-				byte[] buffer = new byte[BUFFER_SIZE];// ç¼“å†²åŒºå¤§å°400000
-				int count = 0;
-				while ((count = is.read(buffer)) > 0) {
-					fos.write(buffer, 0, count);
-				}
-				fos.close();
-				is.close();
+			Log.v("µ±Ç°ÐèÒªµ¼Èë", "µ±Ç°ÐèÒªµ¼Èë");
+			InputStream is = context.getResources().openRawResource(R.raw.data); // Óûµ¼ÈëµÄÊý¾Ý¿â
+			FileOutputStream fos = new FileOutputStream(dbfile);
+			byte[] buffer = new byte[BUFFER_SIZE];
+			int count = 0;
+			while ((count = is.read(buffer)) > 0) {
+				fos.write(buffer, 0, count);
 			}
-			SQLiteDatabase db = SQLiteDatabase.openOrCreateDatabase(dbfile, null);
+			fos.close();
+			is.close();
+			SQLiteDatabase db = SQLiteDatabase.openOrCreateDatabase(dbfile,
+					null);
 			return db;
 		} catch (FileNotFoundException e) {
 			Log.e("Database", "File not found");
@@ -62,8 +63,9 @@ public class DBmanager {
 		this.database.close();
 	}
 
-	public String getIdByCityName(String name) {
-		db = SQLiteDatabase.openOrCreateDatabase(DBmanager.DB_PATH + "/" + DBmanager.DB_NAME, null);
+	public static String getIdByCityName(String name) {
+		SQLiteDatabase db = SQLiteDatabase.openOrCreateDatabase(DB_PATH + "/"
+				+ DB_NAME, null);
 		String id = "";
 		Cursor c = db.rawQuery("select * from citylist ", null);
 		while (c.moveToNext()) {
@@ -73,7 +75,7 @@ public class DBmanager {
 			}
 		}
 		c.close();
-		db.close();
+		// db.close();
 		return id;
 	}
 }

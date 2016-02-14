@@ -32,12 +32,11 @@ import com.stu.zdy.weather_sample.R;
 
 		AssetManager mgr = getActivity().getAssets();
 		@SuppressWarnings("unused")
-		Typeface tf = Typeface.createFromAsset(mgr, "fonts/Roboto-Regular.ttf");// ï¿½ï¿½ï¿½ï¿½Â·ï¿½ï¿½ï¿½Ãµï¿½Typeface
+		Typeface tf = Typeface.createFromAsset(mgr, "fonts/Roboto-Regular.ttf");// ¸ù¾ÝÂ·¾¶µÃµ½Typeface
 		// TextView textView = (TextView) getActivity().findViewById(R.id.help);
 		// textView.setTypeface(tf);
 	}
 
-	@Override
 	public void onResume() {
 		super.onResume();
 		getView().setFocusableInTouchMode(true);
@@ -57,9 +56,9 @@ import com.stu.zdy.weather_sample.R;
 	}
 
 	@Override
-	public void onAttach(Activity activity) {// ï¿½ï¿½ï¿½ï¿½Fragmentï¿½ï¿½ï¿½ï¿½
+	public void onAttach(Activity activity) {// Æô¶¯Fragmentµ÷ÓÃ
 		// TODO Auto-generated method stub
 		super.onAttach(activity);
-		fragmentCallBack = (MainActivity) activity;// ï¿½ï¿½ActivityÊµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½fragmentCallBack
+		fragmentCallBack = (MainActivity) activity;// ½«ActivityÊµÀý¸³¸øfragmentCallBack
 	}
 }

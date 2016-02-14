@@ -13,6 +13,7 @@ import android.os.Parcelable;
 import android.os.SystemClock;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 
@@ -276,7 +277,6 @@ public class ProgressWheel extends View {
 	// Animation stuff
 	// ----------------------------------
 
-	@Override
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
 
@@ -745,12 +745,10 @@ public class ProgressWheel extends View {
 
 		// required field that makes Parcelables from a Parcel
 		public static final Parcelable.Creator<WheelSavedState> CREATOR = new Parcelable.Creator<WheelSavedState>() {
-			@Override
 			public WheelSavedState createFromParcel(Parcel in) {
 				return new WheelSavedState(in);
 			}
 
-			@Override
 			public WheelSavedState[] newArray(int size) {
 				return new WheelSavedState[size];
 			}

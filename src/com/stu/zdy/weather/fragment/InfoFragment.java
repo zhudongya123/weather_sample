@@ -46,26 +46,26 @@ import com.stu.zdy.weather_sample.R;
 				R.id.textview2);
 		TextView textView3 = (TextView) getActivity().findViewById(
 				R.id.textview3);
-		String string = "<p>ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½:<a href=\"http://azuresol.deviantart.com\">AzureSol</a>";
+		String string = "<p>ËØÃèÌìÆøÍ¼±ê×÷Õß:<a href=\"http://azuresol.deviantart.com\">AzureSol</a>";
 		string = string
-				+ "<a href=\"http://creativecommons.org/licenses/by-sa/3.0/\">Ê¹ï¿½ï¿½ï¿½ï¿½ï¿½</a></p>";
+				+ "<a href=\"http://creativecommons.org/licenses/by-sa/3.0/\">Ê¹ÓÃÐí¿É</a></p>";
 		string = string
-				+ "<p>ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ï¿½:Material Design Icons  <a href=\"https://github.com/google/material-design-icons/releases/tag/1.0.0\">Github</a></p>";
+				+ "<p>ÆäËûÍ¼±ê:Material Design Icons  <a href=\"https://github.com/google/material-design-icons/releases/tag/1.0.0\">Github</a></p>";
 		string = string
-				+ "<p>ï¿½ï¿½Ô´ï¿½Ø¼ï¿½:MaterialDialog  <a href=\"https://github.com/drakeet\">GitHub</a></p>";
+				+ "<p>¿ªÔ´¿Ø¼þ:MaterialDialog  <a href=\"https://github.com/drakeet\">GitHub</a></p>";
 		string = string
-				+ "<p>ï¿½ï¿½Ô´ï¿½Ø¼ï¿½:Ldrawer  <a href=\"https://github.com/keklikhasan/LDrawer\">GitHub</a></p>";
+				+ "<p>¿ªÔ´¿Ø¼þ:Ldrawer  <a href=\"https://github.com/keklikhasan/LDrawer\">GitHub</a></p>";
 		string = string
-				+ "<p>ï¿½ï¿½Ô´ï¿½Ø¼ï¿½:FloatingActionButton  <a href=\"https://github.com/makovkastar/FloatingActionButton\">GitHub</a></p>";
+				+ "<p>¿ªÔ´¿Ø¼þ:FloatingActionButton  <a href=\"https://github.com/makovkastar/FloatingActionButton\">GitHub</a></p>";
 		string = string
-				+ "<p>ï¿½ï¿½Ô´ï¿½Ø¼ï¿½:materialish-progress-master  <a href=\"https://github.com/pnikosis/materialish-progress\">GitHub</a></p>";
+				+ "<p>¿ªÔ´¿Ø¼þ:materialish-progress-master  <a href=\"https://github.com/pnikosis/materialish-progress\">GitHub</a></p>";
 		string = string
-				+ "<p>Javaï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½:json-lib  <a href=\"http://json-lib.sourceforge.net\">ï¿½ï¿½Õ¾</a></p>";
-		string = string + "<p>ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ¬Îªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ã£¬LoGoÎªï¿½ï¿½ï¿½Ë¶ï¿½ï¿½Î´ï¿½ï¿½ï¿½</p>";
+				+ "<p>JavaµÚÈý·½¿â:json-lib  <a href=\"http://json-lib.sourceforge.net\">ÍøÕ¾</a></p>";
+		string = string + "<p>ÌìÆøÕÕÆ¬Îª¸öÈËÅÄÉã£¬LoGoÎª¸öÈË¶þ´Î´´×÷</p>";
 		CharSequence charSequence = Html.fromHtml(string);
 		textView2.setText(charSequence);
 		textView2.setMovementMethod(LinkMovementMethod.getInstance());
-		String string2 = "<p>ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½:<a href=\"http://weibo.com/u/3123268127\">@ï¿½ï¿½ï¿½ï¿½ï¿½Äºï¿½Ô°</a></p>";
+		String string2 = "<p>±àÂëÉè¼Æ:<a href=\"http://weibo.com/u/3123268127\">@ÏÈÉúµÄºó»¨Ô°</a></p>";
 
 		CharSequence charSequence2 = Html.fromHtml(string2);
 		textView3.setText(charSequence2);
@@ -73,7 +73,6 @@ import com.stu.zdy.weather_sample.R;
 
 	}
 
-	@Override
 	public void onResume() {
 		super.onResume();
 		getView().setFocusableInTouchMode(true);
@@ -93,9 +92,9 @@ import com.stu.zdy.weather_sample.R;
 	}
 
 	@Override
-	public void onAttach(Activity activity) {// ï¿½ï¿½ï¿½ï¿½Fragmentï¿½ï¿½ï¿½ï¿½
+	public void onAttach(Activity activity) {// Æô¶¯Fragmentµ÷ÓÃ
 		// TODO Auto-generated method stub
 		super.onAttach(activity);
-		fragmentCallBack = (MainActivity) activity;// ï¿½ï¿½ActivityÊµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½fragmentCallBack
+		fragmentCallBack = (MainActivity) activity;// ½«ActivityÊµÀý¸³¸øfragmentCallBack
 	}
 }

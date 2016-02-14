@@ -48,17 +48,16 @@ public class WidgetService extends Service {
 		SharedPreferences preferences = mContext.getSharedPreferences("citys",
 				Context.MODE_PRIVATE);
 		time = preferences.getInt("time", 14400000);
-		Log.e("ï¿½ï¿½ï¿½Ò²ï¿½Ò»ï¿½Â¼ï¿½ï¿½Ê±ï¿½ï¿½ï¿½Ç¶ï¿½ï¿½ï¿½", String.valueOf(time));
-		thread = new Thread() {// ï¿½ï¿½ï¿½ß³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
-			@Override
+		Log.e("¸øÎÒ²éÒ»ÏÂ¼ä¸ôÊ±¼äÊÇ¶àÉÙ", String.valueOf(time));
+		thread = new Thread() {// ´ËÏß³ÌÓÃÀ´ÁªÍø¸üĞÂÊı¾İ
 			public void run() {
 				while (run) {
 					try {
-						Thread.sleep(time);// ï¿½Ó³ï¿½timeï¿½ï¿½ï¿½ï¿½
+						Thread.sleep(time);// ÑÓ³ÙtimeºÁÃë
 					} catch (Exception e) {
 						// TODO: handle exception
 					}
-					Log.v("ï¿½Ú·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½æ·¢ï¿½Í³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÂµÄ¹ã²¥", "ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½settingFragmentÖ¸ï¿½ï¿½");
+					Log.v("ÔÚ·şÎñÀïÃæ·¢ËÍ³öÁËÁ½ÌõĞèÒªÁªÍø¸üĞÂµÄ¹ã²¥", "¼ä¸ôÊ±¼äÓÉsettingFragmentÖ¸¶¨");
 					Intent intent = new Intent(PackageNameBig);
 					intent.putExtra("index", 12);
 					mContext.sendBroadcast(new Intent(intent));
@@ -67,15 +66,14 @@ public class WidgetService extends Service {
 			};
 		};
 		thread.start();
-		thread2 = new Thread() {// ï¿½ï¿½ï¿½ß³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô¶ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½
-			@Override
+		thread2 = new Thread() {// ´ËÏß³ÌÓÃÀ´×Ô¶¯¸üĞÂÊ±ÖÓ
 			public void run() {
 				while (run) {
 					try {
-						Thread.sleep(60000);// Ã¿ï¿½ï¿½Ò»ï¿½ï¿½ï¿½Ó·ï¿½ï¿½ï¿½
+						Thread.sleep(60000);// Ã¿¸ôÒ»·ÖÖÓ·¢ËÍ
 					} catch (Exception e) {
 					}
-					Log.v("ï¿½ï¿½ï¿½ï¿½ï¿½Ë¹ã²¥", "ï¿½ã²¥ï¿½ï¿½ï¿½ï¿½ÊµÊ±ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½");
+					Log.v("·¢³öÁË¹ã²¥", "¹ã²¥ÓÃÀ´ÊµÊ±¸üĞÂÊ±ÖÓ");
 					Intent intent = new Intent(PackageNameBig);
 					intent.putExtra("index", 1);
 					mContext.sendBroadcast(new Intent(intent));

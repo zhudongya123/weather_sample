@@ -13,7 +13,6 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
@@ -168,8 +167,8 @@ public class MaterialDialog {
 			final View.OnClickListener listener) {
 		mPositiveButton = new Button(mContext);
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-				LayoutParams.WRAP_CONTENT,
-				LayoutParams.WRAP_CONTENT);
+				LinearLayout.LayoutParams.WRAP_CONTENT,
+				LinearLayout.LayoutParams.WRAP_CONTENT);
 		mPositiveButton.setLayoutParams(params);
 		mPositiveButton.setBackgroundResource(R.drawable.button);
 		mPositiveButton.setTextColor(Color.argb(255, 35, 159, 242));
@@ -177,8 +176,8 @@ public class MaterialDialog {
 		mPositiveButton.setGravity(Gravity.CENTER);
 		mPositiveButton.setTextSize(14);
 		LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-				LayoutParams.WRAP_CONTENT,
-				LayoutParams.WRAP_CONTENT);
+				LinearLayout.LayoutParams.WRAP_CONTENT,
+				LinearLayout.LayoutParams.WRAP_CONTENT);
 		layoutParams
 				.setMargins(dip2px(2), 0, dip2px(12), dip2px(BUTTON_BOTTOM));
 		mPositiveButton.setLayoutParams(layoutParams);
@@ -193,8 +192,8 @@ public class MaterialDialog {
 			final View.OnClickListener listener) {
 		mPositiveButton = new Button(mContext);
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-				LayoutParams.WRAP_CONTENT,
-				LayoutParams.WRAP_CONTENT);
+				LinearLayout.LayoutParams.WRAP_CONTENT,
+				LinearLayout.LayoutParams.WRAP_CONTENT);
 		mPositiveButton.setLayoutParams(params);
 		mPositiveButton.setBackgroundResource(R.drawable.button);
 		mPositiveButton.setTextColor(Color.argb(255, 35, 159, 242));
@@ -202,8 +201,8 @@ public class MaterialDialog {
 		mPositiveButton.setGravity(Gravity.CENTER);
 		mPositiveButton.setTextSize(14);
 		LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-				LayoutParams.WRAP_CONTENT,
-				LayoutParams.WRAP_CONTENT);
+				LinearLayout.LayoutParams.WRAP_CONTENT,
+				LinearLayout.LayoutParams.WRAP_CONTENT);
 		layoutParams
 				.setMargins(dip2px(2), 0, dip2px(12), dip2px(BUTTON_BOTTOM));
 		mPositiveButton.setLayoutParams(layoutParams);
@@ -218,8 +217,8 @@ public class MaterialDialog {
 			final View.OnClickListener listener) {
 		mNegativeButton = new Button(mContext);
 		mLayoutParams = new LinearLayout.LayoutParams(
-				LayoutParams.WRAP_CONTENT,
-				LayoutParams.WRAP_CONTENT);
+				LinearLayout.LayoutParams.WRAP_CONTENT,
+				LinearLayout.LayoutParams.WRAP_CONTENT);
 		mNegativeButton.setLayoutParams(mLayoutParams);
 		mNegativeButton.setBackgroundResource(R.drawable.button);
 		mNegativeButton.setText(resId);
@@ -238,8 +237,8 @@ public class MaterialDialog {
 			final View.OnClickListener listener) {
 		mNegativeButton = new Button(mContext);
 		mLayoutParams = new LinearLayout.LayoutParams(
-				LayoutParams.WRAP_CONTENT,
-				LayoutParams.WRAP_CONTENT);
+				LinearLayout.LayoutParams.WRAP_CONTENT,
+				LinearLayout.LayoutParams.WRAP_CONTENT);
 		mNegativeButton.setLayoutParams(mLayoutParams);
 		mNegativeButton.setBackgroundResource(R.drawable.button);
 		mNegativeButton.setText(text);
@@ -298,8 +297,8 @@ public class MaterialDialog {
 			mAlertDialogWindow.setContentView(contv);
 
 			WindowManager.LayoutParams params = new WindowManager.LayoutParams(
-					LayoutParams.WRAP_CONTENT,
-					LayoutParams.WRAP_CONTENT,
+					WindowManager.LayoutParams.WRAP_CONTENT,
+					WindowManager.LayoutParams.WRAP_CONTENT,
 					WindowManager.LayoutParams.TYPE_PHONE,
 					WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM,
 					PixelFormat.TRANSLUCENT);
@@ -411,8 +410,8 @@ public class MaterialDialog {
 				final View.OnClickListener listener) {
 			Button button = new Button(mContext);
 			LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-					LayoutParams.WRAP_CONTENT,
-					LayoutParams.WRAP_CONTENT);
+					LinearLayout.LayoutParams.WRAP_CONTENT,
+					LinearLayout.LayoutParams.WRAP_CONTENT);
 			button.setLayoutParams(params);
 			button.setBackgroundResource(R.drawable.material_card);
 			button.setTextColor(Color.argb(255, 35, 159, 242));
@@ -435,8 +434,8 @@ public class MaterialDialog {
 				final View.OnClickListener listener) {
 			Button button = new Button(mContext);
 			LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-					LayoutParams.WRAP_CONTENT,
-					LayoutParams.WRAP_CONTENT);
+					LinearLayout.LayoutParams.WRAP_CONTENT,
+					LinearLayout.LayoutParams.WRAP_CONTENT);
 			button.setLayoutParams(params);
 			button.setBackgroundResource(R.drawable.material_card);
 			button.setText(text);

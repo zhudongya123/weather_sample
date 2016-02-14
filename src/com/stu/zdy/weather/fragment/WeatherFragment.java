@@ -1,26 +1,12 @@
 package com.stu.zdy.weather.fragment;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-import com.stu.zdy.weather.activity.MainActivity;
-import com.stu.zdy.weather.db.DBmanager;
-import com.stu.zdy.weather.floatingActionButton.FloatingActionButton;
-import com.stu.zdy.weather.floatingActionButton.ObservableScrollView;
-import com.stu.zdy.weather.floatingActionButton.ScrollDirectionListener;
-import com.stu.zdy.weather.net.GetInternetInfo;
-import com.stu.zdy.weather.net.JsonDataAnalysisByHe;
-import com.stu.zdy.weather.object.FragmentCallBack;
-import com.stu.zdy.weather.util.ScreenUtils;
-import com.stu.zdy.weather_sample.R;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
@@ -32,8 +18,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
+import android.text.Spannable;
 import android.text.SpannableStringBuilder;
-import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -52,9 +38,21 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
-import net.sf.json.JSONObject;
 
-@SuppressLint("SdCardPath")
+import com.stu.zdy.weather.activity.MainActivity;
+import com.stu.zdy.weather.db.DBManager;
+import com.stu.zdy.weather.floatingActionButton.FloatingActionButton;
+import com.stu.zdy.weather.floatingActionButton.ObservableScrollView;
+import com.stu.zdy.weather.floatingActionButton.ScrollDirectionListener;
+import com.stu.zdy.weather.interfaces.WeatherCallBack;
+import com.stu.zdy.weather.net.JsonDataAnalysisByHe;
+import com.stu.zdy.weather.object.FragmentCallBack;
+import com.stu.zdy.weather.util.FileUtils;
+import com.stu.zdy.weather.util.NetWorkUtils;
+import com.stu.zdy.weather.util.OkHttpUtils;
+import com.stu.zdy.weather.util.ScreenUtils;
+import com.stu.zdy.weather_sample.R;
+
 public class WeatherFragment extends Fragment {
 	private int height, width;
 	private FragmentCallBack fragmentCallBack = null;
@@ -80,9 +78,7 @@ public class WeatherFragment extends Fragment {
 	int[] monthDays = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 	private int drawableWidth;
 
-	// @Override
 	@Override
-	@SuppressWarnings("unused")
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
@@ -90,20 +86,34 @@ public class WeatherFragment extends Fragment {
 		getActivity().getWindowManager().getDefaultDisplay().getMetrics(dm);
 		height = dm.heightPixels;
 		width = (int) (dm.widthPixels * 0.9528);
-		SharedPreferences sharedPreferences = getActivity()
-				.getSharedPreferences("citys", Context.MODE_PRIVATE);
 		initUI();
-		if (-1 != GetInternetInfo.getConnectedType(getActivity())) {
+		if (-1 != NetWorkUtils.getConnectedType(getActivity())) {
+			// OkHttpUtils httpUtils = new OkHttpUtils(new WeatherCallBack() {
+			//
+			// @Override
+			// public void onUpdate() {
+			// // TODO Auto-generated method stub
+			//
+			// }
+			//
+			// });
+			// httpUtils.run(getActivity(), "");
 			GetInfomationFromNetInFragment getInfomationFromNet = new GetInfomationFromNetInFragment();
 			getInfomationFromNet.execute(getArguments().getString("city"));
 		} else {
-			File file = new File("/data/data/com.stu.zdy.weather_sample/files");
+			File file = new File(getActivity().getFilesDir().getPath());
 			String[] filelist = file.list();
 			for (String string : filelist) {
-				Log.v("文件列表", string);
 				if (string.equals(getArguments().getString("city"))) {
-					JSONObject jsonObject = JSONObject
-							.fromObject(read(getArguments().getString("city")));
+					JSONObject jsonObject = null;
+					try {
+						jsonObject = new JSONObject(
+								FileUtils.read(getActivity(), getArguments()
+										.getString("city")));
+					} catch (JSONException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 					Log.v("取出的文件数据", jsonObject.toString());
 					Bundle bundle = new JsonDataAnalysisByHe(jsonObject)
 							.getBundle();
@@ -133,7 +143,7 @@ public class WeatherFragment extends Fragment {
 		swipeRefreshLayout.setOnRefreshListener(new OnRefreshListener() {
 			@Override
 			public void onRefresh() {
-				if (GetInternetInfo.getConnectedType(getActivity()) != -1) {
+				if (NetWorkUtils.getConnectedType(getActivity()) != -1) {
 					GetInfomationFromNetInFragment getInfomationFromNet = new GetInfomationFromNetInFragment();
 					getInfomationFromNet.execute(getArguments().getString(
 							"city"));
@@ -293,7 +303,7 @@ public class WeatherFragment extends Fragment {
 			@Override
 			public void onClick(View arg0) {
 				// TODO Auto-generated method stub
-				fragmentCallBack.callbackMainFragment(null, 0);
+				fragmentCallBack.callbackWeatherFragment(null, 0);
 			}
 		});
 		statusWeatherLayout = new LinearLayout(getActivity());// 天气建议布局，三级布局
@@ -381,7 +391,7 @@ public class WeatherFragment extends Fragment {
 
 		int j = 0;
 		SharedPreferences sharedPreferences = getActivity()
-				.getSharedPreferences("citys", Context.MODE_PRIVATE);
+				.getSharedPreferences("weather_info", Context.MODE_PRIVATE);
 		for (int i = calendar.get(Calendar.DAY_OF_WEEK); i < calendar
 				.get(Calendar.DAY_OF_WEEK) + 5; i++) {// 绑定星期
 			futureWeatherWeeks[j]
@@ -393,7 +403,7 @@ public class WeatherFragment extends Fragment {
 				ForegroundColorSpan span = new ForegroundColorSpan(
 						changeColorByTemper(temperatureDatas[j + 5]));
 				builder.setSpan(span, 2, futureWeatherWeeks[j].getText()
-						.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+						.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 				futureWeatherWeeks[j].setText(builder);
 			}
 
@@ -421,7 +431,7 @@ public class WeatherFragment extends Fragment {
 						futureWeatherDatas[i].getText().toString());
 				ForegroundColorSpan span = new ForegroundColorSpan(
 						changeColorByTemper(temperatureDatas[i]));
-				builder.setSpan(span, 0, 3, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+				builder.setSpan(span, 0, 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 				futureWeatherDatas[i].setText(builder);
 			}
 		}
@@ -523,13 +533,13 @@ public class WeatherFragment extends Fragment {
 		hotIndex = hotIndex > 40 ? 40 : hotIndex;
 		hotIndex = hotIndex < 0 ? 0 : hotIndex;
 		if (hotIndex <= 32 || hotIndex <= 24) {
-			green = (32 - hotIndex) * 12;
+			green = (int) ((32 - hotIndex) * 12);
 			red = 255;
 			blue = 0;
 		}
 		if (hotIndex <= 24 || hotIndex <= 16) {
 			red = 255;
-			green = 96 + (24 - hotIndex) * 12;
+			green = (int) (96 + (24 - hotIndex) * 12);
 			blue = 0;
 		}
 		if (hotIndex <= 16 || hotIndex <= 8) {
@@ -590,43 +600,6 @@ public class WeatherFragment extends Fragment {
 		}
 	}
 
-	private void write(String cityName, String data) {// 写入文件
-		// TODO Auto-generated method stub
-		try {
-			FileOutputStream fileOutputStream = getActivity().openFileOutput(
-					cityName, Context.MODE_PRIVATE);
-			PrintStream printStream = new PrintStream(fileOutputStream);
-			printStream.print(data);
-			printStream.close();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
-	private String read(String cityName) {// 读取文件
-		// TODO Auto-generated method stub
-		try {
-			FileInputStream fileInputStream = getActivity().openFileInput(
-					cityName);
-			byte[] bs = new byte[3072];
-			int hasRead = 0;
-			StringBuilder stringBuilder = new StringBuilder("");
-			while ((hasRead = fileInputStream.read(bs)) > 0) {
-				stringBuilder.append(new String(bs, 0, hasRead));
-			}
-			fileInputStream.close();
-			return stringBuilder.toString();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
-	}
-
 	@Override
 	public void onAttach(Activity activity) {
 		// TODO Auto-generated method stub
@@ -652,14 +625,12 @@ public class WeatherFragment extends Fragment {
 		protected String doInBackground(String... params) {
 			// TODO Auto-generated method stub
 			Log.d("Fragment+doInBackground", "Fragment+doInBackground");
-			DBmanager dbHelper = new DBmanager(getActivity());
-			dbHelper.openDatabase();
-			dbHelper.closeDatabase();
+
 			String httpUrl = "https://api.heweather.com/x3/weather?cityid="
-					+ dbHelper.getIdByCityName(params[0])
+					+ DBManager.getIdByCityName(params[0])
 					+ "&key=57efa20515e94db68ae042319463dba4";
-			String jsonResult = GetInternetInfo.request(httpUrl);
-			write(params[0], jsonResult);
+			String jsonResult = NetWorkUtils.request(httpUrl);
+			FileUtils.write(getActivity(), params[0], jsonResult);
 			return jsonResult;
 		}
 
@@ -667,18 +638,31 @@ public class WeatherFragment extends Fragment {
 		protected void onPostExecute(String result) {
 			// TODO Auto-generated method stub
 			Log.d("Fragment+onPostExecute", "Fragment+onPostExecute");
-			JSONObject jsonObject = JSONObject.fromObject(result);
+			JSONObject jsonObject = null;
+			try {
+				jsonObject = new JSONObject(result);
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			Bundle bundle = new Bundle();
 			bundle = new JsonDataAnalysisByHe(jsonObject).getBundle();
 			if (bundle.getString("status").equals("ok")) {
 				bildView(bundle);
 				swipeRefreshLayout.setRefreshing(false);
 				bundle.clear();
-				bundle.putString("city",
-						jsonObject.getJSONArray("HeWeather data service 3.0")
-								.getJSONObject(0).getJSONObject("basic")
-								.getString("city"));
-				fragmentCallBack.callbackMainFragment(bundle, 2);
+				try {
+					bundle.putString(
+							"city",
+							jsonObject
+									.getJSONArray("HeWeather data service 3.0")
+									.getJSONObject(0).getJSONObject("basic")
+									.getString("city"));
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				fragmentCallBack.callbackWeatherFragment(bundle, 2);
 			} else {
 				Toast.makeText(getActivity(), "服务器出错", Toast.LENGTH_SHORT)
 						.show();

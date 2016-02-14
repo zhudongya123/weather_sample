@@ -54,7 +54,7 @@ public class SettingFragment extends Fragment {
 	public void onActivityCreated(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onActivityCreated(savedInstanceState);
-		sharedPreferences = getActivity().getSharedPreferences("citys",
+		sharedPreferences = getActivity().getSharedPreferences("weather_info",
 				Context.MODE_PRIVATE);
 		editor = sharedPreferences.edit();
 		MyListView listView = (MyListView) getActivity().findViewById(
@@ -65,7 +65,6 @@ public class SettingFragment extends Fragment {
 				R.layout.setting_listview, new String[] { "descride", "info" },
 				new int[] { R.id.descride, R.id.detail });
 		for (int i = 0; i < 10; i++) {
-
 			HashMap<String, Object> map = new HashMap<String, Object>();
 			switch (i) {
 			case 0:
@@ -132,9 +131,6 @@ public class SettingFragment extends Fragment {
 							@Override
 							public void onClick(View v) {
 								// TODO Auto-generated method stub
-								sharedPreferences = getActivity()
-										.getSharedPreferences("citys",
-												Context.MODE_PRIVATE);
 								editor = sharedPreferences.edit();
 								switch (textView.getId()) {
 								case 13:
@@ -214,9 +210,6 @@ public class SettingFragment extends Fragment {
 							@Override
 							public void onClick(View v) {
 								// TODO Auto-generated method stub
-								sharedPreferences = getActivity()
-										.getSharedPreferences("citys",
-												Context.MODE_PRIVATE);
 								editor = sharedPreferences.edit();
 								switch (textView.getId()) {
 								case 17:
@@ -266,9 +259,6 @@ public class SettingFragment extends Fragment {
 							@Override
 							public void onClick(View v) {
 								// TODO Auto-generated method stub
-								sharedPreferences = getActivity()
-										.getSharedPreferences("citys",
-												Context.MODE_PRIVATE);
 								editor = sharedPreferences.edit();
 								switch (textView.getId()) {
 								case 19:
@@ -326,9 +316,6 @@ public class SettingFragment extends Fragment {
 							@Override
 							public void onClick(View v) {
 								// TODO Auto-generated method stub
-								sharedPreferences = getActivity()
-										.getSharedPreferences("citys",
-												Context.MODE_PRIVATE);
 								editor = sharedPreferences.edit();
 								switch (textView.getId()) {
 								case 21:
@@ -360,8 +347,6 @@ public class SettingFragment extends Fragment {
 					break;
 
 				case 4:
-					sharedPreferences = getActivity().getSharedPreferences(
-							"citys", Context.MODE_PRIVATE);
 					final MaterialDialog dialog5 = new MaterialDialog(
 							getActivity());
 					LinearLayout layout5 = new LinearLayout(getActivity());
@@ -397,9 +382,6 @@ public class SettingFragment extends Fragment {
 								@Override
 								public void onClick(View v) {
 									// TODO Auto-generated method stub
-									sharedPreferences = getActivity()
-											.getSharedPreferences("citys",
-													Context.MODE_PRIVATE);
 									editor = sharedPreferences.edit();
 									editor.putString("packagename", editText
 											.getText().toString());
@@ -414,18 +396,15 @@ public class SettingFragment extends Fragment {
 
 			}
 		});
-		sharedPreferences = getActivity().getSharedPreferences("citys",
-				Context.MODE_PRIVATE);
-		Log.e("刷新时间", String.valueOf(sharedPreferences.getInt("time", 0)));
-		Log.e("开关呢", String.valueOf(sharedPreferences.getInt("advice", 3)));
-		Log.e("导航栏呢", String.valueOf(sharedPreferences.getInt("bar", 3)));
-		Log.e("颜色呢", String.valueOf(sharedPreferences.getInt("morecolor", 3)));
-		Log.e("包名呢", String.valueOf(sharedPreferences.getString("packagename",
+		Log.v("刷新时间", String.valueOf(sharedPreferences.getInt("time", 0)));
+		Log.v("开关呢", String.valueOf(sharedPreferences.getInt("advice", 3)));
+		Log.v("导航栏呢", String.valueOf(sharedPreferences.getInt("bar", 3)));
+		Log.v("颜色呢", String.valueOf(sharedPreferences.getInt("morecolor", 3)));
+		Log.v("包名呢", String.valueOf(sharedPreferences.getString("packagename",
 				"com.google.android.deskclock")));
 
 	}
 
-	@Override
 	public void onResume() {
 		super.onResume();
 		getView().setFocusableInTouchMode(true);

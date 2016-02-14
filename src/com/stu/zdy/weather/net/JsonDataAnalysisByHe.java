@@ -2,13 +2,14 @@ package com.stu.zdy.weather.net;
 
 import java.util.ArrayList;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.os.Bundle;
 import android.util.Log;
 
-import net.sf.json.JSONObject;
-
 /**
- * 解析和风天气返回的Json数据
+ * �����ͷ��������ص�Json����
  * 
  * @author Zdy
  * 
@@ -16,32 +17,45 @@ import net.sf.json.JSONObject;
 public class JsonDataAnalysisByHe {
 
 	private JSONObject jsonObject;
-	public ArrayList<String> item1 = new ArrayList<String>();// 状态信息和实时天气
-	public ArrayList<String> item2 = new ArrayList<String>();// 未来五天的天气
-	public ArrayList<String> item3 = new ArrayList<String>();// 三小时天气
-	public ArrayList<String> item4 = new ArrayList<String>();// 生活建议
+	public ArrayList<String> item1 = new ArrayList<String>();// ״̬��Ϣ��ʵʱ����
+	public ArrayList<String> item2 = new ArrayList<String>();// δ�����������
+	public ArrayList<String> item3 = new ArrayList<String>();// ��Сʱ����
+	public ArrayList<String> item4 = new ArrayList<String>();// �����
 	private Bundle bundle;
 
 	public JsonDataAnalysisByHe(JSONObject jsonObject) {
 		this.jsonObject = jsonObject;
-		Log.v("当前服务器状态", jsonObject.getJSONArray("HeWeather data service 3.0")
-				.getJSONObject(0).getString("status"));
-		if (jsonObject.getJSONArray("HeWeather data service 3.0")
-				.getJSONObject(0).getString("status").equals("ok")) {
-			analysisData();
-		} else {
-			bundle = new Bundle();
-			bundle.putString("status", "error");
+		try {
+			Log.v("��ǰ������״̬", jsonObject.getJSONArray("HeWeather data service 3.0")
+					.getJSONObject(0).getString("status"));
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			if (jsonObject.getJSONArray("HeWeather data service 3.0")
+					.getJSONObject(0).getString("status").equals("ok")) {
+				analysisData();
+			} else {
+				bundle = new Bundle();
+				bundle.putString("status", "error");
+			}
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 
 	/**
-	 * @author Zdy item1从下标0开始分别为：城市，城市ID，更新时间，天气，湿度，风力，温度，天气代码,紫外线强度
-	 *         item2从下标0到4为未来五日的低温，5到9为未来五日的高温
-	 *         ，10到14分别为未来五日的天气情况代码，15到24每两个为单日的天气情况
-	 *         item3为为三小时天气预报，长度不定，根据显示的情况，时间在前，温度在后。 item4为生活建议
+	 * @author Zdy
+	 *         item1���±�0��ʼ�ֱ�Ϊ�����У�����ID������ʱ�䣬������ʪ�ȣ��������¶ȣ���
+	 *         ������,������ǿ�� item2���±�0��4Ϊδ�����յĵ��£�5��9Ϊδ�����յĸ���
+	 *         ��10��14�ֱ�Ϊδ�����յ�����������룬15��24ÿ����Ϊ���յ��������
+	 *         item3ΪΪ��Сʱ����Ԥ�������Ȳ�����������ʾ�������ʱ����ǰ���¶��ں�
+	 *         item4Ϊ�����
+	 * @throws JSONException
 	 */
-	private void analysisData() {
+	private void analysisData() throws JSONException {
 		JSONObject jsonitem = jsonObject
 				.getJSONArray("HeWeather data service 3.0").getJSONObject(0)
 				.getJSONObject("basic");
@@ -77,7 +91,7 @@ public class JsonDataAnalysisByHe {
 		}
 		for (int i = 0; i < jsonObject
 				.getJSONArray("HeWeather data service 3.0").getJSONObject(0)
-				.getJSONArray("hourly_forecast").size(); i++) {
+				.getJSONArray("hourly_forecast").length(); i++) {
 			jsonitem = jsonObject.getJSONArray("HeWeather data service 3.0")
 					.getJSONObject(0).getJSONArray("hourly_forecast")
 					.getJSONObject(i);

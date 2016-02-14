@@ -1,9 +1,11 @@
 package com.stu.zdy.weather.activity;
 
 import java.util.ArrayList;
-import net.sf.json.JSONObject;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.annotation.TargetApi;
-import android.app.ActionBar;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
@@ -18,7 +20,6 @@ import android.content.res.AssetManager;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
@@ -32,7 +33,6 @@ import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
@@ -47,30 +47,30 @@ import android.widget.Toast;
 
 import com.stu.zdy.weather.Ldrawer.ActionBarDrawerToggle;
 import com.stu.zdy.weather.Ldrawer.DrawerArrowDrawable;
-import com.stu.zdy.weather.db.DBmanager;
-import com.stu.zdy.weather.fragment.CityFragment;
+import com.stu.zdy.weather.db.DBManager;
 import com.stu.zdy.weather.fragment.HelpFragment;
 import com.stu.zdy.weather.fragment.InfoFragment;
+import com.stu.zdy.weather.fragment.ManageCityFragment;
 import com.stu.zdy.weather.fragment.SettingFragment;
 import com.stu.zdy.weather.fragment.WeatherFragment;
-import com.stu.zdy.weather.net.GetInternetInfo;
-import com.stu.zdy.weather.net.JsonDataAnalysisByHe;
 import com.stu.zdy.weather.object.FragmentCallBack;
 import com.stu.zdy.weather.object.MaterialDialog;
 import com.stu.zdy.weather.object.MyFragmentPagerAdapter;
 import com.stu.zdy.weather.object.ProgressWheel;
 import com.stu.zdy.weather.service.WidgetService;
+import com.stu.zdy.weather.util.FileUtils;
+import com.stu.zdy.weather.util.NetWorkUtils;
 import com.stu.zdy.weather.util.ScreenUtils;
 import com.stu.zdy.weather_sample.R;
 
+@SuppressWarnings("deprecation")
 @TargetApi(Build.VERSION_CODES.KITKAT)
 public class MainActivity extends Activity implements FragmentCallBack {
 
 	private Context mContext;
 	private int height, width;
 	private String[] cityTemperature = { "", "", "", "", "", "", "", "", "" };
-	private String[] cityList = { "", "", "", "", "", "", "", "", "" };
-	private android.support.v4.widget.DrawerLayout mDrawerLayout;// 抽屉布局
+	private DrawerLayout mDrawerLayout;// 抽屉布局
 
 	private AbsoluteLayout rootContentLayout;// 根内容布局
 	private RelativeLayout drawerContentLayout;// 抽屉根布局
@@ -79,177 +79,105 @@ public class MainActivity extends Activity implements FragmentCallBack {
 	private LinearLayout fragmentLayout;
 	private ActionBarDrawerToggle mDrawerToggle;
 	private DrawerArrowDrawable drawerArrow;
-	private String dataCity;
+
 	private ViewPager viewPager;
 	private FragmentManager fragmentManager;
 	private FragmentTransaction fragmentTransaction;
 	private ArrayList<Fragment> fragments;
-	private ProgressWheel progressWheel;
+	//private ProgressWheel progressWheel;
 
 	private String forWidgetString;
 	private SharedPreferences sharedPreferences;
-	private int runtime = 0;
 	private int cityNumber;
-	private int mark = 0;
 	private ImageView drawerBackGround;
 	private ImageView drawerWeatherPictureImageView;
 	private TextView drawerTextView;
 	private MaterialDialog mMaterialDialog;
 	private ArrayList<String> cityWeatherArrayList = new ArrayList<String>();
 
-	private CityFragment cityFragment;
+	private ManageCityFragment cityFragment;
 	private SettingFragment settingFragment;
 	private InfoFragment infoFragment;
 	private HelpFragment helpFragment;
 
-	@TargetApi(Build.VERSION_CODES.KITKAT)
+	private JSONObject citylist;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		mContext = this;
+		sharedPreferences = mContext.getSharedPreferences("weather_info",
+				Context.MODE_PRIVATE);
 		getActionBar().hide();
 		setScreenParameter();
 		fragmentManager = getFragmentManager();
 		fragmentTransaction = fragmentManager.beginTransaction();
-		getDataFromPreferences();
 		initUI();
 		initDrawer();
 		fragments = new ArrayList<Fragment>();
-		if (GetInternetInfo.getConnectedType(mContext) != -1) {
-			if (dataCity.equals("")) {// 当前城市列表为空时选择
-				mMaterialDialog = new MaterialDialog(mContext)
-						.setTitle("请添加城市").setMessage("理论上支持县及其以上城市")
-						.setText("")
-						.setPositiveButton("确认", new View.OnClickListener() {
-							@Override
-							public void onClick(View v) {
-								final String BigBomb = mMaterialDialog
-										.getText();
-								DBmanager dbHelper = new DBmanager(mContext);
-								dbHelper.openDatabase();
-								dbHelper.closeDatabase();
-								if (dbHelper.getIdByCityName(
-										mMaterialDialog.getText()).equals("")) {
-									Toast.makeText(
-											mContext.getApplicationContext(),
-											"输入有错误", Toast.LENGTH_SHORT).show();
-								} else {
-									SharedPreferences sharedPreferences = mContext
-											.getSharedPreferences("citys",
-													Context.MODE_PRIVATE);
-									Editor editor = sharedPreferences.edit();
-									editor.putString("citys", BigBomb);
-									editor.putString("cityName", BigBomb);
-									editor.putInt("count", 2);
-									editor.commit();
-									initViewPager();
-									mMaterialDialog.dismiss();
-								}
-							}
-						});
-				mMaterialDialog.show();
-			} else {
+		citylist = FileUtils.getCityList(mContext);
+
+		try {
+			if (citylist.getJSONArray("citylist").length() == 0) {// 城市列表为空
+				if (NetWorkUtils.hasInternetConnection(mContext)) {// 存在网络
+					showMaterialDialog();
+				} else {
+					Toast.makeText(mContext, "当前没有网络又没有文件缓存",
+							Toast.LENGTH_SHORT).show();
+				}
+			} else {// 城市列表不为空
 				initViewPager();
+				if (!NetWorkUtils.hasInternetConnection(mContext)) {// 不存在网络的时候添加提示
+					Toast.makeText(mContext, "当前没有网络，正在使用文件缓存",
+							Toast.LENGTH_SHORT).show();
+				}
 			}
-		}
-		if (GetInternetInfo.getConnectedType(mContext) == -1) {
-			Toast.makeText(mContext, "请打开网络后重试", Toast.LENGTH_SHORT).show();
-			initViewPager();
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		runService();
 	}
 
+	/**
+	 * 设置虚拟按键透明和状态栏透明
+	 */
 	private void setScreenParameter() {
 		height = ScreenUtils.getScreenHeight(mContext);
 		width = ScreenUtils.getScreenWidth(mContext);
 		height = height - ScreenUtils.getStatusHeight(mContext);
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {// AP>=19的时候启用透明状态栏
 			Window window = getWindow();
 			window.setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS,
 					WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);// 透明状态栏
 		}
-		sharedPreferences = getSharedPreferences("citys", Context.MODE_PRIVATE);
-		if (checkDeviceHasNavigationBar(mContext)
-				&& sharedPreferences.getInt("bar", 0) == 1) {
+		if (checkDeviceHasNavigationBar(mContext)// 根据设置选择是否透明状态栏
+				&& sharedPreferences.getInt("navibar", 0) == 1) {
 			Window window = getWindow();
 			window.setFlags(
 					WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION,
 					WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
-			Log.v("当前设备存在虚拟按键", "当前设备存在虚拟按键");
 			height = (int) (height / 0.925);
 		}
-		Log.v(String.valueOf(width), String.valueOf(height));
-	}
-
-	private void getDataFromPreferences() {// 从存储中获取数据
-		sharedPreferences = getSharedPreferences("citys", Context.MODE_PRIVATE);
-		analyseCitysFromPreferences(sharedPreferences.getString("citys", ""));
-	}
-
-	private void saveDataToPreferences(String string) {// 存储数据
-		sharedPreferences = getSharedPreferences("citys", Context.MODE_PRIVATE);
-		Editor editor = sharedPreferences.edit();
-		editor.putString("citys", string);
-		editor.putString("cityName", cityList[0]);
-		editor.commit();
-	}
-
-	/**
-	 * 将字符串城市列表解析为城市数组，并返回当前城市的数目
-	 * 
-	 * @author Zdy
-	 * @param string
-	 * @return
-	 */
-	private int analyseCitysFromPreferences(String string) {
-		dataCity = string + ",";
-		Log.v("从Preferences获得城市列表", dataCity);
-		for (int i = 0; i < cityList.length; i++) {
-			cityList[i] = "";
-		}
-		int j = 0, k = 0;
-		for (int i = 0; i < dataCity.length(); i++) {
-			if (dataCity.substring(i, i + 1).equals(",")) {
-				cityList[k] = dataCity.substring(j, i);
-				j = i + 1;
-				Log.v("当前第" + k + "个城市", cityList[k]);
-				k++;
-			}
-		}
-		cityNumber = k;
-		dataCity = dataCity.substring(0, dataCity.length() - 1);
-		return k;
-	}
-
-	@Override
-	public void onBackPressed() {
-		// TODO Auto-generated method stub
-		super.onBackPressed();
-		saveDataToPreferences(dataCity);
 	}
 
 	private void initViewPager() {
 		// TODO Auto-generated method stub
-		sharedPreferences = getSharedPreferences("citys", Context.MODE_PRIVATE);
-		dataCity = sharedPreferences.getString("citys", "");
-		analyseCitysFromPreferences(dataCity);
-		fragments = new ArrayList<Fragment>();
-		for (int i = 0; i < cityList.length; i++) {
-			if (!cityList[i].equals("")) {
-				Log.v(String.valueOf("初始化第" + i + "个MainFragment"), cityList[i]);
-				Log.v("查询的城市为：", cityList[i]);
-				if (GetInternetInfo.getConnectedType(mContext) != -1) {
-					GetInfomationFromNetInActivity getInfomationFromNetInActivity = new GetInfomationFromNetInActivity();
-					getInfomationFromNetInActivity.execute(cityList[i] + ","
-							+ String.valueOf(i));
-				}
-				WeatherFragment mainFragment = new WeatherFragment();
-				Bundle bundle = new Bundle();
-				bundle.putString("city", cityList[i]);
-				mainFragment.setArguments(bundle);
-				fragments.add(mainFragment);
 
+		fragments = new ArrayList<Fragment>();
+		citylist = FileUtils.getCityList(mContext);
+		try {
+			for (int i = 0; i < citylist.getJSONArray("citylist").length(); i++) {
+				String city = (String) citylist.getJSONArray("citylist").get(i);
+				WeatherFragment weatherFragment = new WeatherFragment();
+				Bundle bundle = new Bundle();
+				bundle.putString("city", city);// 将城市名称传递给fragment
+				weatherFragment.setArguments(bundle);
+				fragments.add(weatherFragment);
 			}
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		MyFragmentPagerAdapter adapter = new MyFragmentPagerAdapter(
 				fragmentManager, fragments);
@@ -258,15 +186,11 @@ public class MainActivity extends Activity implements FragmentCallBack {
 		if (cityNumber >= 4) {
 			Toast.makeText(mContext, "城市太多啦！为了不让机器造成卡顿，请自行左右滑动",
 					Toast.LENGTH_SHORT).show();
-		} else {
-			analyseCitysFromPreferences(dataCity);
 		}
+		// adapter.notifyDataSetChanged();
 	}
 
 	private void initUI() {
-		ActionBar ab = getActionBar();
-		ab.setDisplayHomeAsUpEnabled(true);
-		ab.setHomeButtonEnabled(true);
 		mDrawerLayout = new DrawerLayout(mContext);// 抽屉布局
 		mDrawerLayout.setLayoutParams(new DrawerLayout.LayoutParams(
 				LayoutParams.MATCH_PARENT, height));
@@ -334,7 +258,6 @@ public class MainActivity extends Activity implements FragmentCallBack {
 				LayoutParams.MATCH_PARENT, height * 584 / 640));
 		weatherLayout.setOrientation(LinearLayout.VERTICAL);
 		weatherLayout.setId(4);
-		Log.v(String.valueOf(height), String.valueOf(width));
 		fragmentLayout = new LinearLayout(mContext);
 		fragmentLayout.setId(5);
 		fragmentLayout.setLayoutParams(new LayoutParams(ScreenUtils
@@ -356,18 +279,19 @@ public class MainActivity extends Activity implements FragmentCallBack {
 					+ ScreenUtils.getStatusHeight(mContext));
 		}
 		fragmentLayout.setX(ScreenUtils.getScreenWidth(mContext));
-		progressWheel = new ProgressWheel(mContext);
-		progressWheel.setLayoutParams(new LayoutParams(width / 8, width / 8));
-		progressWheel.setBarColor(Color.rgb(85, 136, 255));
-		progressWheel.setX((float) (width / 2 * 0.9));
-		progressWheel.setY((float) (height / 2 * 1.2));
-		progressWheel.setBarWidth(6);
+		// progressWheel = new ProgressWheel(mContext);
+		// progressWheel.setLayoutParams(new LayoutParams(width / 8, width /
+		// 8));
+		// progressWheel.setBarColor(Color.rgb(85, 136, 255));
+		// progressWheel.setX((float) (width / 2 * 0.9));
+		// progressWheel.setY((float) (height / 2 * 1.2));
+		// progressWheel.setBarWidth(6);
 
-		progressWheel.spin();
+	//	progressWheel.spin();
 		rootContentLayout.addView(toolBar);
 		rootContentLayout.addView(weatherLayout);
 		rootContentLayout.addView(fragmentLayout);
-		rootContentLayout.addView(progressWheel);
+		//rootContentLayout.addView(progressWheel);
 		weatherLayout.addView(viewPager);
 		mDrawerLayout.addView(rootContentLayout);
 		mDrawerLayout.addView(drawerContentLayout);
@@ -382,8 +306,7 @@ public class MainActivity extends Activity implements FragmentCallBack {
 		arrow.setScaleType(ScaleType.CENTER);
 		arrow.setImageResource(R.drawable.ic_drawer);
 		arrow.setLayoutParams(arrowParams);
-		arrow.setOnClickListener(new OnClickListener() {
-
+		arrow.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
 				// TODO Auto-generated method stub
@@ -408,104 +331,51 @@ public class MainActivity extends Activity implements FragmentCallBack {
 	}
 
 	private void initDrawerContent(Typeface tf) {
-		String[] functionItem1 = { "查看天气", "城市管理" };
-		int[] functionItem2 = { R.drawable.ic_wb_sunny_grey600_24dp,
+		String[] drawerFunctionText = { "查看天气", "城市管理" };
+		int[] drawerFunctionIcon = { R.drawable.ic_wb_sunny_grey600_24dp,
 				R.drawable.ic_location_city_grey600_24dp };
-		LinearLayout drawerItemFirstLayout = new LinearLayout(mContext);
-		drawerItemFirstLayout.setOrientation(LinearLayout.VERTICAL);
-		RelativeLayout.LayoutParams drawerItemFirstLayoutParams = new RelativeLayout.LayoutParams(
+		LinearLayout drawerFunctionLayout = new LinearLayout(mContext);
+		drawerFunctionLayout.setOrientation(LinearLayout.VERTICAL);
+		RelativeLayout.LayoutParams drawerFunctionLayoutParams = new RelativeLayout.LayoutParams(
 				LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-		drawerItemFirstLayoutParams.setMargins(0, height / 50, 0, 0);
-		drawerItemFirstLayoutParams.addRule(RelativeLayout.BELOW,
+		drawerFunctionLayoutParams.setMargins(0, height / 50, 0, 0);
+		drawerFunctionLayoutParams.addRule(RelativeLayout.BELOW,
 				drawerBackGround.getId());
-		drawerItemFirstLayout.setLayoutParams(drawerItemFirstLayoutParams);
-		for (int i = 0; i < functionItem2.length; i++) {
-			LinearLayout drawerItem_1 = new LinearLayout(mContext);
-			drawerItem_1.setGravity(Gravity.CENTER_VERTICAL);
-			drawerItem_1.setOrientation(LinearLayout.HORIZONTAL);
+		drawerFunctionLayout.setLayoutParams(drawerFunctionLayoutParams);
+		for (int i = 0; i < drawerFunctionIcon.length; i++) {
+			LinearLayout drawerFunctionItem = new LinearLayout(mContext);
+			drawerFunctionItem.setGravity(Gravity.CENTER_VERTICAL);
+			drawerFunctionItem.setOrientation(LinearLayout.HORIZONTAL);
 			RelativeLayout.LayoutParams drawerItem_1Params = new RelativeLayout.LayoutParams(
 					LayoutParams.MATCH_PARENT, width * 48 / 360);
 			drawerItem_1Params.addRule(RelativeLayout.BELOW,
 					drawerBackGround.getId());
-			drawerItem_1.setLayoutParams(drawerItem_1Params);
+			drawerFunctionItem.setLayoutParams(drawerItem_1Params);
 			drawerItem_1Params.setMargins(0, width * 16 / 360, 0,
 					width * 8 / 360);
-			ImageView drawerItem_1ImageView = new ImageView(mContext);
-			LinearLayout.LayoutParams drawerItem_1ImageViewLayoutParams = new LinearLayout.LayoutParams(
+			ImageView drawerFunctionItemImage = new ImageView(mContext);
+			LinearLayout.LayoutParams drawerFunctionItemImageParams = new LinearLayout.LayoutParams(
 					width * 24 / 360, width * 24 / 360);
-			drawerItem_1ImageViewLayoutParams.setMargins(width * 16 / 360, 0,
-					0, 0);
-			drawerItem_1ImageView
-					.setLayoutParams(drawerItem_1ImageViewLayoutParams);
-			drawerItem_1ImageView.setScaleType(ScaleType.CENTER_CROP);
-			drawerItem_1ImageView.setImageResource(functionItem2[i]);
-			final TextView drawerItem_1TextView = new TextView(mContext);
-			drawerItem_1TextView.setLayoutParams(new LayoutParams(
+			drawerFunctionItemImageParams.setMargins(width * 16 / 360, 0, 0, 0);
+			drawerFunctionItemImage
+					.setLayoutParams(drawerFunctionItemImageParams);
+			drawerFunctionItemImage.setScaleType(ScaleType.CENTER_CROP);
+			drawerFunctionItemImage.setImageResource(drawerFunctionIcon[i]);
+			final TextView drawerFunctionItemText = new TextView(mContext);
+			drawerFunctionItemText.setLayoutParams(new LayoutParams(
 					LayoutParams.WRAP_CONTENT, height * 24 / 640));
-			drawerItem_1TextView.setText(functionItem1[i]);
-			drawerItem_1TextView.setTextColor(Color.rgb(150, 150, 150));
-			drawerItem_1TextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-			drawerItem_1TextView.setGravity(Gravity.CENTER_VERTICAL);
-			drawerItem_1TextView.setPadding(height * 32 / 640, 0, 0, 0);
-			drawerItem_1.addView(drawerItem_1ImageView);
-			drawerItem_1.addView(drawerItem_1TextView);
-			drawerItemFirstLayout.addView(drawerItem_1);
-			drawerItem_1.setOnClickListener(new OnClickListener() {
-				@Override
-				public void onClick(View arg0) {
-					// TODO Auto-generated method stub
-					if (-1 != GetInternetInfo.getConnectedType(mContext)) {
-
-						fragmentManager = getFragmentManager();
-						fragmentTransaction = fragmentManager
-								.beginTransaction();
-						if (drawerItem_1TextView.getText().equals("城市管理")) {
-							sharedPreferences = getSharedPreferences("citys",
-									Context.MODE_PRIVATE);
-							dataCity = sharedPreferences.getString("citys",
-									"北京");
-							saveDataToPreferences(dataCity);
-							Bundle bundle = new Bundle();
-							bundle.putString("citys", dataCity);
-							if (fragmentManager
-									.findFragmentByTag("cityFragment") == null) {
-								// weatherLayout.removeAllViews();
-								fragmentLayout.setX(0);
-								weatherLayout.setX(ScreenUtils
-										.getScreenWidth(mContext));
-								cityFragment = new CityFragment();
-								cityFragment.setArguments(bundle);
-								fragmentTransaction.replace(
-										fragmentLayout.getId(), cityFragment,
-										"cityFragment");
-								fragmentTransaction.commit();
-							} else {
-								Toast.makeText(mContext,
-										"已经打开管理城市的列表啦！(｡・`ω´･)",
-										Toast.LENGTH_SHORT).show();
-							}
-							mDrawerLayout.closeDrawer(drawerContentLayout);
-						}
-						if (drawerItem_1TextView.getText().equals("查看天气")) {
-							fragmentManager = getFragmentManager();
-							fragmentTransaction = fragmentManager
-									.beginTransaction();
-							weatherLayout.setX(0);
-							fragmentLayout.setX(ScreenUtils
-									.getScreenWidth(mContext));
-
-							mDrawerLayout.closeDrawer(drawerContentLayout);
-						}
-					} else {
-						Toast.makeText(mContext, "请打开网络再试", Toast.LENGTH_SHORT)
-								.show();
-					}
-				}
-
-			});
+			drawerFunctionItemText.setText(drawerFunctionText[i]);
+			drawerFunctionItemText.setTextColor(Color.rgb(150, 150, 150));
+			drawerFunctionItemText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+			drawerFunctionItemText.setGravity(Gravity.CENTER_VERTICAL);
+			drawerFunctionItemText.setPadding(height * 32 / 640, 0, 0, 0);
+			drawerFunctionItem.addView(drawerFunctionItemImage);
+			drawerFunctionItem.addView(drawerFunctionItemText);
+			drawerFunctionLayout.addView(drawerFunctionItem);
+			drawerFunctionItem.setOnClickListener(new MyDrawerClickListener(i));
 
 		}
-		drawerContentLayout.addView(drawerItemFirstLayout);
+		drawerContentLayout.addView(drawerFunctionLayout);
 		String[] item1 = { "设置", "关于", "帮助" };
 		int[] item2 = { R.drawable.ic_settings_applications_grey600_24dp,
 				R.drawable.ic_info_grey600_24dp,
@@ -549,47 +419,7 @@ public class MainActivity extends Activity implements FragmentCallBack {
 			drawer_ItemTextView.setTypeface(tf);// 设置字体
 			drawer_Item.addView(drawer_ItemImageView);
 			drawer_Item.addView(drawer_ItemTextView);
-			drawer_Item.setOnClickListener(new OnClickListener() {
-
-				@Override
-				public void onClick(View arg0) {
-					// TODO Auto-generated method stub
-					fragmentManager = getFragmentManager();
-					fragmentTransaction = fragmentManager.beginTransaction();
-					if (drawer_ItemTextView.getText().equals("关于")) {
-						fragmentLayout.setX(0);
-						weatherLayout.setX(ScreenUtils.getScreenWidth(mContext));
-						if (fragmentManager.findFragmentByTag("infoFragment") == null) {
-							infoFragment = new InfoFragment();
-							fragmentTransaction.replace(fragmentLayout.getId(),
-									infoFragment, "infoFragment");
-						}
-					}
-					if (drawer_ItemTextView.getText().equals("设置")) {
-						fragmentLayout.setX(0);
-						weatherLayout.setX(ScreenUtils.getScreenWidth(mContext));
-						if (fragmentManager
-								.findFragmentByTag("settingFragment") == null) {
-							settingFragment = new SettingFragment();
-							fragmentTransaction.replace(fragmentLayout.getId(),
-									settingFragment, "settingFragment");
-						}
-					}
-
-					if (drawer_ItemTextView.getText().equals("帮助")) {
-						fragmentLayout.setX(0);
-						weatherLayout.setX(ScreenUtils.getScreenWidth(mContext));
-						if (fragmentManager.findFragmentByTag("helpFragment") == null) {
-							helpFragment = new HelpFragment();
-							fragmentTransaction.replace(fragmentLayout.getId(),
-									helpFragment, "helpFragment");
-						}
-					}
-					fragmentTransaction.commit();
-					mDrawerLayout.closeDrawer(Gravity.LEFT);
-
-				}
-			});
+			drawer_Item.setOnClickListener(new MyDrawerClickListener(i + 2));
 			drawerItemSecondLayout.addView(drawer_Item);
 		}
 		drawerContentLayout.addView(drawerItemSecondLayout);
@@ -662,41 +492,47 @@ public class MainActivity extends Activity implements FragmentCallBack {
 	}
 
 	private void sendDataToWidget(JSONObject jsonObject) {
-		sharedPreferences = getSharedPreferences("citys", Context.MODE_PRIVATE);
-		if (jsonObject.toString().substring(1, 2).equals("{")
-				&& sharedPreferences.getString("cityName", "").equals(
-						jsonObject.getJSONArray("HeWeather data service 3.0")
+		try {
+			if (jsonObject.toString().substring(1, 2).equals("{")
+					&& sharedPreferences.getString("defaultCity", "").equals(
+							jsonObject
+									.getJSONArray("HeWeather data service 3.0")
+									.getJSONObject(0).getJSONObject("basic")
+									.getString("city"))) {
+				Editor editor = sharedPreferences.edit();
+				forWidgetString = jsonObject
+						.getJSONArray("HeWeather data service 3.0")
+						.getJSONObject(0).getJSONObject("basic")
+						.getString("city")
+						+ ","
+						+ jsonObject.getJSONArray("HeWeather data service 3.0")
+								.getJSONObject(0).getJSONObject("now")
+								.getString("tmp")
+						+ ","
+						+ jsonObject.getJSONArray("HeWeather data service 3.0")
+								.getJSONObject(0).getJSONObject("now")
+								.getJSONObject("cond").getString("txt")
+						+ ","
+						+ jsonObject.getJSONArray("HeWeather data service 3.0")
 								.getJSONObject(0).getJSONObject("basic")
-								.getString("city"))) {
-			Editor editor = sharedPreferences.edit();
-			forWidgetString = jsonObject
-					.getJSONArray("HeWeather data service 3.0")
-					.getJSONObject(0).getJSONObject("basic").getString("city")
-					+ ","
-					+ jsonObject.getJSONArray("HeWeather data service 3.0")
-							.getJSONObject(0).getJSONObject("now")
-							.getString("tmp")
-					+ ","
-					+ jsonObject.getJSONArray("HeWeather data service 3.0")
-							.getJSONObject(0).getJSONObject("now")
-							.getJSONObject("cond").getString("txt")
-					+ ","
-					+ jsonObject.getJSONArray("HeWeather data service 3.0")
-							.getJSONObject(0).getJSONObject("basic")
-							.getJSONObject("update").getString("loc")
-							.substring(11, 16)
-					+ "更新"
-					+ ","
-					+ jsonObject.getJSONArray("HeWeather data service 3.0")
-							.getJSONObject(0).getJSONObject("now")
-							.getJSONObject("cond").getString("code");
-			editor.putString("widget", forWidgetString);
-			editor.commit();
-			Intent intent = new Intent("com.stu.zdy.weather.big");
-			intent.putExtra("index", 1);
-			sendBroadcast(intent);
-			Intent intent2 = new Intent("com.stu.zdy.weather.small");
-			sendBroadcast(intent2);
+								.getJSONObject("update").getString("loc")
+								.substring(11, 16)
+						+ "更新"
+						+ ","
+						+ jsonObject.getJSONArray("HeWeather data service 3.0")
+								.getJSONObject(0).getJSONObject("now")
+								.getJSONObject("cond").getString("code");
+				editor.putString("widget", forWidgetString);
+				editor.commit();
+				Intent intent = new Intent("com.stu.zdy.weather.big");
+				intent.putExtra("index", 1);
+				sendBroadcast(intent);
+				Intent intent2 = new Intent("com.stu.zdy.weather.small");
+				sendBroadcast(intent2);
+			}
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 
@@ -761,7 +597,6 @@ public class MainActivity extends Activity implements FragmentCallBack {
 				mDrawerLayout.openDrawer(Gravity.LEFT);
 			}
 		}
-
 		return super.onOptionsItemSelected(item);
 	}
 
@@ -795,144 +630,34 @@ public class MainActivity extends Activity implements FragmentCallBack {
 		return false;
 	}
 
-	@Override
-	public void callbackMainFragment(Bundle arg, int number) {
-		// TODO Auto-generated method stub
-		if (number == 0) {
-			getDataFromPreferences();
-			saveDataToPreferences(dataCity);
-			if (-1 != GetInternetInfo.getConnectedType(mContext)) {
-				mMaterialDialog = new MaterialDialog(mContext).setTitle("添加城市")
-						.setMessage("理论上支持县及其以上城市").setText("")
-						.setPositiveButton("确定", new View.OnClickListener() {
-							@Override
-							public void onClick(View v) {
-								if (cityNumber == 8) {
-									Toast.makeText(mContext,
-											"已经达到收录城市的上限啦！请删除一些城市再试！",
-											Toast.LENGTH_SHORT).show();
-								} else {
-									Log.v("你输入的城市为", mMaterialDialog.getText());
-									DBmanager dbHelper = new DBmanager(mContext);
-									dbHelper.openDatabase();
-									dbHelper.closeDatabase();
-									if (dbHelper.getIdByCityName(
-											mMaterialDialog.getText()).equals(
-											"")) {
-										Toast.makeText(
-												mContext.getApplicationContext(),
-												"输入有错误", Toast.LENGTH_SHORT)
-												.show();
-									} else {// 输入成功
-										SharedPreferences sharedPreferences = mContext
-												.getSharedPreferences("citys",
-														Context.MODE_PRIVATE);
-										Editor editor = sharedPreferences
-												.edit();
-										editor.putString(
-												"citys",
-												sharedPreferences.getString(
-														"citys", "")
-														+ ","
-														+ mMaterialDialog
-																.getText());// 更新城市列表
-										editor.commit();
-										viewPager.removeAllViews();
-										initViewPager();
-										mMaterialDialog.dismiss();
+	private void showMaterialDialog() {
+		mMaterialDialog = new MaterialDialog(mContext).setTitle("添加城市")
+				.setMessage("理论上支持县及其以上城市").setText("")
+				.setPositiveButton("确定", new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						if (DBManager
+								.getIdByCityName(mMaterialDialog.getText())
+								.equals("")) {
+							Toast.makeText(mContext.getApplicationContext(),
+									"输入有错误", Toast.LENGTH_SHORT).show();
+						} else {// 输入成功
+							FileUtils.saveCityList(mContext,
+									FileUtils.DataOperate.ADD,
+									mMaterialDialog.getText());
+							viewPager.removeAllViews();
+							initViewPager();
+							mMaterialDialog.dismiss();
 
-									}
-								}
-							}
-						}).setNegativeButton("取消", new View.OnClickListener() {
-							@Override
-							public void onClick(View v) {
-								mMaterialDialog.dismiss();
-							}
-						});
-				mMaterialDialog.show();
-			} else {
-				Toast.makeText(mContext, "请打开网络后再试", Toast.LENGTH_SHORT).show();
-			}
-		}
-		if (number == 1) {
-			Intent i = getBaseContext().getPackageManager()
-					.getLaunchIntentForPackage(
-							getBaseContext().getPackageName());
-			i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			startActivity(i);
-		}
-		if (number == 2) {
-			if (viewPager.getCurrentItem() == 0) {
-				// ((TextView) toolBar.getChildAt(1)).setText(arg.getString(
-				// "city", "质感天气"));
-			}
-		}
-
-	}
-
-	class GetInfomationFromNetInActivity extends
-			AsyncTask<String, String, String> {
-		@Override
-		protected String doInBackground(String... params) {
-			// TODO Auto-generated method stub
-			Log.d("Activity+doInBackground", "Activity+doInBackground");
-			Log.v("传入的参数", params[0]);
-			String city = null;
-			for (int i = 0; i < params[0].length(); i++) {
-				if (params[0].substring(i, i + 1).equals(",")) {
-					city = params[0].substring(0, i);
-				}
-			}
-			Log.v("要联网查询的城市", city);
-			DBmanager dbHelper = new DBmanager(getApplicationContext());
-			dbHelper.openDatabase();
-			dbHelper.closeDatabase();
-			String httpUrl = "https://api.heweather.com/x3/weather?cityid="
-					+ dbHelper.getIdByCityName(city)
-					+ "&key=57efa20515e94db68ae042319463dba4";
-			String jsonResult = GetInternetInfo.request(httpUrl);
-			return jsonResult;
-		}
-
-		@Override
-		protected void onPostExecute(String result) {
-			// TODO Auto-generated method stub
-			Log.d("Activity+onPostExecute", "Activity+onPostExecute");
-			JSONObject jsonObject = JSONObject.fromObject(result);
-			sendDataToWidget(jsonObject);
-			Bundle bundle = new JsonDataAnalysisByHe(jsonObject).getBundle();
-			if (bundle.getString("status").equals("ok")) {
-				for (int i = 0; i < cityTemperature.length; i++) {
-					if (bundle.getStringArrayList("item1").get(0).toString()
-							.equals(cityList[i])) {
-						cityTemperature[i] = bundle.getStringArrayList("item1")
-								.get(6);
-						cityWeatherArrayList.add(i,
-								bundle.getStringArrayList("item1").get(6));
+						}
 					}
-				}
-				Log.v("获取城市的温度", "获取城市的温度");
-				for (int i = 0; i < 6; i++) {
-					Log.v("cityTemperature", cityTemperature[i]);
-				}
-				runtime++;
-				if (cityNumber == runtime) {
-					Log.v("当前城市温度", cityTemperature[0]);
-					setActionbarColor(Integer.valueOf(cityTemperature[0]));
-					setViewListener();
-					if (mark == 0) {
-						viewPager.setCurrentItem(0);
-						mark++;
-					} else {
-						viewPager.setCurrentItem(cityNumber);
+				}).setNegativeButton("取消", new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						mMaterialDialog.dismiss();
 					}
-					runtime = 0;
-					progressWheel.stopSpinning();
-				}
-			}
-			super.onPostExecute(result);
-		}
+				});
+		mMaterialDialog.show();
 	}
 
 	private void setViewListener() {
@@ -940,8 +665,9 @@ public class MainActivity extends Activity implements FragmentCallBack {
 			@Override
 			public void onPageSelected(int arg0) {
 				// TODO Auto-generated method stub
-				((TextView) toolBar.getChildAt(1)).setText(cityList[viewPager
-						.getCurrentItem()]);
+				((TextView) toolBar.getChildAt(1)).setText(FileUtils
+						.getCityFromJsonArray(mContext,
+								viewPager.getCurrentItem()));
 				try {
 					Log.v("当前标签页的温度", String.valueOf(cityTemperature[viewPager
 							.getCurrentItem()]));
@@ -985,9 +711,14 @@ public class MainActivity extends Activity implements FragmentCallBack {
 				changeWeatherPicture(Integer.valueOf(cityWeatherArrayList
 						.get(viewPager.getCurrentItem())),
 						drawerWeatherPictureImageView);
-				drawerTextView.setText(cityList[viewPager.getCurrentItem()]
-						+ "\n" + cityTemperature[viewPager.getCurrentItem()]
-						+ "°");
+				drawerTextView.setText(FileUtils.getCityFromJsonArray(mContext,
+						viewPager.getCurrentItem()) + "°");
+				Log.v("抽屉栏的天气文本",
+						FileUtils.getCityFromJsonArray(mContext,
+								viewPager.getCurrentItem())
+								+ "\n"
+								+ cityTemperature[viewPager.getCurrentItem()]
+								+ "°");
 				((TextView) toolBar.getChildAt(1)).setText("质感天气");
 				if (Integer.valueOf(cityTemperature[viewPager.getCurrentItem()]) > 28) {
 					drawerBackGround.setImageResource(R.drawable.high_temper);
@@ -1003,21 +734,43 @@ public class MainActivity extends Activity implements FragmentCallBack {
 			public void onDrawerClosed(View arg0) {
 				// TODO Auto-generated method stub
 				if (viewPager != null) {
-					((TextView) toolBar.getChildAt(1))
-							.setText(cityList[viewPager.getCurrentItem()]);
-					getActionBar().setTitle(
-							cityList[viewPager.getCurrentItem()]);
+					((TextView) toolBar.getChildAt(1)).setText(FileUtils
+							.getCityFromJsonArray(mContext,
+									viewPager.getCurrentItem()));
 				}
 			}
 		});
 	}
 
 	@Override
+	public void callbackWeatherFragment(Bundle arg, int number) {
+		// TODO Auto-generated method stub
+		if (number == 0) {
+			if (NetWorkUtils.hasInternetConnection(mContext)) {
+				showMaterialDialog();
+			} else {
+				Toast.makeText(mContext, "请打开网络后再试", Toast.LENGTH_SHORT).show();
+			}
+		}
+		if (number == 1) {
+			Intent i = getBaseContext().getPackageManager()
+					.getLaunchIntentForPackage(
+							getBaseContext().getPackageName());
+			i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			startActivity(i);
+		}
+		if (number == 2) {
+			if (viewPager.getCurrentItem() == 0) {
+			}
+		}
+
+	}
+
+	@Override
 	public void callbackCityFragment(Bundle arg) {
 		// TODO Auto-generated method stub
-		if (-1 != GetInternetInfo.getConnectedType(mContext)) {
-			saveDataToPreferences(arg.getString("citys"));
-			getDataFromPreferences();
+		if (NetWorkUtils.hasInternetConnection(mContext)) {
+
 			Intent i = getBaseContext().getPackageManager()
 					.getLaunchIntentForPackage(
 							getBaseContext().getPackageName());
@@ -1032,7 +785,6 @@ public class MainActivity extends Activity implements FragmentCallBack {
 	@Override
 	public void callbackSettingFragment(Bundle arg) {
 		// TODO Auto-generated method stub
-		fragmentManager = getFragmentManager();
 		fragmentTransaction = fragmentManager.beginTransaction();
 		weatherLayout.setX(0);
 		fragmentLayout.setX(ScreenUtils.getScreenWidth(mContext));
@@ -1043,7 +795,6 @@ public class MainActivity extends Activity implements FragmentCallBack {
 	@Override
 	public void callbackInfoFragment(Bundle arg) {
 		// TODO Auto-generated method stub
-		fragmentManager = getFragmentManager();
 		fragmentTransaction = fragmentManager.beginTransaction();
 		weatherLayout.setX(0);
 		fragmentLayout.setX(ScreenUtils.getScreenWidth(mContext));
@@ -1054,11 +805,85 @@ public class MainActivity extends Activity implements FragmentCallBack {
 	@Override
 	public void callbackHelpFragment(Bundle arg) {
 		// TODO Auto-generated method stub
-		fragmentManager = getFragmentManager();
 		fragmentTransaction = fragmentManager.beginTransaction();
 		weatherLayout.setX(0);
 		fragmentLayout.setX(ScreenUtils.getScreenWidth(mContext));
 		fragmentTransaction.remove(helpFragment);
 		fragmentTransaction.commit();
+	}
+
+	class MyDrawerClickListener implements View.OnClickListener {
+		int position;
+
+		MyDrawerClickListener(int position) {
+			this.position = position;
+		}
+
+		@Override
+		public void onClick(View v) {
+			// TODO Auto-generated method stub
+			fragmentTransaction = fragmentManager.beginTransaction();
+			switch (position) {
+			case 0:// 显示天气
+				weatherLayout.setX(0);
+				fragmentLayout.setX(ScreenUtils.getScreenWidth(mContext));
+				mDrawerLayout.closeDrawer(drawerContentLayout);
+				break;
+			case 1:// 城市管理
+				Bundle bundle = new Bundle();
+				bundle.putString("citys", FileUtils.getCityList(mContext)
+						.toString());
+				if (fragmentManager.findFragmentByTag("cityFragment") == null) {
+					fragmentLayout.setX(0);
+					weatherLayout.setX(ScreenUtils.getScreenWidth(mContext));
+					cityFragment = new ManageCityFragment();
+					cityFragment.setArguments(bundle);
+					fragmentTransaction.replace(fragmentLayout.getId(),
+							cityFragment, "cityFragment");
+					fragmentTransaction.commit();
+				} else {
+					Toast.makeText(mContext, "已经打开管理城市的列表啦！(｡・`ω´･)",
+							Toast.LENGTH_SHORT).show();
+				}
+				mDrawerLayout.closeDrawer(drawerContentLayout);
+				break;
+			case 2:// 设置
+				fragmentLayout.setX(0);
+				weatherLayout.setX(ScreenUtils.getScreenWidth(mContext));
+				if (fragmentManager.findFragmentByTag("settingFragment") == null) {
+					settingFragment = new SettingFragment();
+					fragmentTransaction.replace(fragmentLayout.getId(),
+							settingFragment, "settingFragment");
+				}
+				fragmentTransaction.commit();
+				mDrawerLayout.closeDrawer(Gravity.LEFT);
+				break;
+			case 3:// 信息
+				fragmentLayout.setX(0);
+				weatherLayout.setX(ScreenUtils.getScreenWidth(mContext));
+				if (fragmentManager.findFragmentByTag("infoFragment") == null) {
+					infoFragment = new InfoFragment();
+					fragmentTransaction.replace(fragmentLayout.getId(),
+							infoFragment, "infoFragment");
+				}
+				fragmentTransaction.commit();
+				mDrawerLayout.closeDrawer(Gravity.LEFT);
+
+				break;
+			case 4:// 帮助
+				fragmentLayout.setX(0);
+				weatherLayout.setX(ScreenUtils.getScreenWidth(mContext));
+				if (fragmentManager.findFragmentByTag("helpFragment") == null) {
+					helpFragment = new HelpFragment();
+					fragmentTransaction.replace(fragmentLayout.getId(),
+							helpFragment, "helpFragment");
+				}
+				fragmentTransaction.commit();
+				mDrawerLayout.closeDrawer(Gravity.LEFT);
+				break;
+
+			}
+		}
+
 	}
 }
