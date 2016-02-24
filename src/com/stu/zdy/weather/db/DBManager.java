@@ -15,29 +15,20 @@ import com.stu.zdy.weather_sample.R;
 
 public class DBManager {
 	private final static int BUFFER_SIZE = 400000;
-	public static final String DB_NAME = "data.db"; // 保存的数据库文件名
+	public static final String DB_NAME = "data.db"; //
 	public static final String PACKAGE_NAME = "com.stu.zdy.weather_sample";
 	public static final String DB_PATH = "/data"
 			+ Environment.getDataDirectory().getAbsolutePath() + "/"
-			+ PACKAGE_NAME; // 在手机里存放数据库的位置
+			+ PACKAGE_NAME; // 
 
 	private SQLiteDatabase database;
-	private Context context;
-	private SQLiteDatabase db;
+	
 
-	public DBManager(Context context) {
-		this.context = context;
-	}
-
-	public void openDatabase() {
-//		this.database = this.copyDataBaseFromRaw();
-	}
 
 	public static SQLiteDatabase copyDataBaseFromRaw(Context context) {
 		String dbfile = DB_PATH + "/" + DB_NAME;
 		try {
-			Log.v("当前需要导入", "当前需要导入");
-			InputStream is = context.getResources().openRawResource(R.raw.data); // 欲导入的数据库
+			InputStream is = context.getResources().openRawResource(R.raw.data); 
 			FileOutputStream fos = new FileOutputStream(dbfile);
 			byte[] buffer = new byte[BUFFER_SIZE];
 			int count = 0;

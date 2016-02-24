@@ -5,6 +5,23 @@ import java.util.ArrayList;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.stu.zdy.weather.Ldrawer.ActionBarDrawerToggle;
+import com.stu.zdy.weather.Ldrawer.DrawerArrowDrawable;
+import com.stu.zdy.weather.db.DBManager;
+import com.stu.zdy.weather.fragment.HelpFragment;
+import com.stu.zdy.weather.fragment.InfoFragment;
+import com.stu.zdy.weather.fragment.ManageCityFragment;
+import com.stu.zdy.weather.fragment.SettingFragment;
+import com.stu.zdy.weather.fragment.WeatherFragment;
+import com.stu.zdy.weather.object.FragmentCallBack;
+import com.stu.zdy.weather.object.MaterialDialog;
+import com.stu.zdy.weather.object.MyFragmentPagerAdapter;
+import com.stu.zdy.weather.service.WidgetService;
+import com.stu.zdy.weather.util.FileUtils;
+import com.stu.zdy.weather.util.NetWorkUtils;
+import com.stu.zdy.weather.util.ScreenUtils;
+import com.stu.zdy.weather_sample.R;
+
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ActivityManager;
@@ -45,24 +62,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.stu.zdy.weather.Ldrawer.ActionBarDrawerToggle;
-import com.stu.zdy.weather.Ldrawer.DrawerArrowDrawable;
-import com.stu.zdy.weather.db.DBManager;
-import com.stu.zdy.weather.fragment.HelpFragment;
-import com.stu.zdy.weather.fragment.InfoFragment;
-import com.stu.zdy.weather.fragment.ManageCityFragment;
-import com.stu.zdy.weather.fragment.SettingFragment;
-import com.stu.zdy.weather.fragment.WeatherFragment;
-import com.stu.zdy.weather.object.FragmentCallBack;
-import com.stu.zdy.weather.object.MaterialDialog;
-import com.stu.zdy.weather.object.MyFragmentPagerAdapter;
-import com.stu.zdy.weather.object.ProgressWheel;
-import com.stu.zdy.weather.service.WidgetService;
-import com.stu.zdy.weather.util.FileUtils;
-import com.stu.zdy.weather.util.NetWorkUtils;
-import com.stu.zdy.weather.util.ScreenUtils;
-import com.stu.zdy.weather_sample.R;
-
 @SuppressWarnings("deprecation")
 @TargetApi(Build.VERSION_CODES.KITKAT)
 public class MainActivity extends Activity implements FragmentCallBack {
@@ -84,7 +83,6 @@ public class MainActivity extends Activity implements FragmentCallBack {
 	private FragmentManager fragmentManager;
 	private FragmentTransaction fragmentTransaction;
 	private ArrayList<Fragment> fragments;
-	//private ProgressWheel progressWheel;
 
 	private String forWidgetString;
 	private SharedPreferences sharedPreferences;
@@ -106,8 +104,7 @@ public class MainActivity extends Activity implements FragmentCallBack {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		mContext = this;
-		sharedPreferences = mContext.getSharedPreferences("weather_info",
-				Context.MODE_PRIVATE);
+		sharedPreferences = mContext.getSharedPreferences("weather_info", Context.MODE_PRIVATE);
 		getActionBar().hide();
 		setScreenParameter();
 		fragmentManager = getFragmentManager();
@@ -122,21 +119,19 @@ public class MainActivity extends Activity implements FragmentCallBack {
 				if (NetWorkUtils.hasInternetConnection(mContext)) {// 存在网络
 					showMaterialDialog();
 				} else {
-					Toast.makeText(mContext, "当前没有网络又没有文件缓存",
-							Toast.LENGTH_SHORT).show();
+					Toast.makeText(mContext, "当前没有网络又没有文件缓存", Toast.LENGTH_SHORT).show();
 				}
 			} else {// 城市列表不为空
 				initViewPager();
 				if (!NetWorkUtils.hasInternetConnection(mContext)) {// 不存在网络的时候添加提示
-					Toast.makeText(mContext, "当前没有网络，正在使用文件缓存",
-							Toast.LENGTH_SHORT).show();
+					Toast.makeText(mContext, "当前没有网络，正在使用文件缓存", Toast.LENGTH_SHORT).show();
 				}
 			}
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		runService();
+		//runService();
 	}
 
 	/**
@@ -154,8 +149,7 @@ public class MainActivity extends Activity implements FragmentCallBack {
 		if (checkDeviceHasNavigationBar(mContext)// 根据设置选择是否透明状态栏
 				&& sharedPreferences.getInt("navibar", 0) == 1) {
 			Window window = getWindow();
-			window.setFlags(
-					WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION,
+			window.setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION,
 					WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
 			height = (int) (height / 0.925);
 		}
@@ -179,36 +173,32 @@ public class MainActivity extends Activity implements FragmentCallBack {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		MyFragmentPagerAdapter adapter = new MyFragmentPagerAdapter(
-				fragmentManager, fragments);
+		MyFragmentPagerAdapter adapter = new MyFragmentPagerAdapter(fragmentManager, fragments);
 		viewPager.setAdapter(adapter);
 		viewPager.setOffscreenPageLimit(4);
 		if (cityNumber >= 4) {
-			Toast.makeText(mContext, "城市太多啦！为了不让机器造成卡顿，请自行左右滑动",
-					Toast.LENGTH_SHORT).show();
+			Toast.makeText(mContext, "城市太多啦！为了不让机器造成卡顿，请自行左右滑动", Toast.LENGTH_SHORT).show();
 		}
 		// adapter.notifyDataSetChanged();
 	}
 
 	private void initUI() {
 		mDrawerLayout = new DrawerLayout(mContext);// 抽屉布局
-		mDrawerLayout.setLayoutParams(new DrawerLayout.LayoutParams(
-				LayoutParams.MATCH_PARENT, height));
+		mDrawerLayout.setLayoutParams(new DrawerLayout.LayoutParams(LayoutParams.MATCH_PARENT, height));
 		rootContentLayout = new AbsoluteLayout(this);// 主内容布局
-		rootContentLayout.setLayoutParams(new DrawerLayout.LayoutParams(
-				LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+		rootContentLayout
+				.setLayoutParams(new DrawerLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 		rootContentLayout.setId(1);
 		drawerContentLayout = new RelativeLayout(mContext);// 抽屉内容区域布局
 		drawerContentLayout.setBackgroundColor(Color.rgb(255, 255, 255));
-		DrawerLayout.LayoutParams drawerContentLayoutParams = new DrawerLayout.LayoutParams(
-				width * 304 / 360, LayoutParams.MATCH_PARENT);
+		DrawerLayout.LayoutParams drawerContentLayoutParams = new DrawerLayout.LayoutParams(width * 304 / 360,
+				LayoutParams.MATCH_PARENT);
 		drawerContentLayoutParams.gravity = Gravity.LEFT;
 		drawerContentLayout.setLayoutParams(drawerContentLayoutParams);
 		drawerBackGround = new ImageView(mContext);
 		drawerBackGround.setId(2);
 		RelativeLayout.LayoutParams drawerBackGroundParams = new RelativeLayout.LayoutParams(
-				drawerContentLayoutParams.width,
-				drawerContentLayoutParams.width / 16 * 9);
+				drawerContentLayoutParams.width, drawerContentLayoutParams.width / 16 * 9);
 		drawerBackGroundParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, 1);
 		drawerBackGround.setLayoutParams(drawerBackGroundParams);
 		drawerBackGround.setScaleType(ScaleType.CENTER_CROP);
@@ -218,10 +208,8 @@ public class MainActivity extends Activity implements FragmentCallBack {
 				LayoutParams.WRAP_CONTENT, width * 56 / 360);
 		drawerTextView.setPadding(width * 10 / 360, width * 10 / 360, 0, 0);
 		drawerTextViewParams.setMargins(16 * width / 360, 0, 0, 0);
-		drawerTextViewParams.addRule(RelativeLayout.ALIGN_LEFT,
-				drawerBackGround.getId());
-		drawerTextViewParams.addRule(RelativeLayout.ALIGN_BOTTOM,
-				drawerBackGround.getId());
+		drawerTextViewParams.addRule(RelativeLayout.ALIGN_LEFT, drawerBackGround.getId());
+		drawerTextViewParams.addRule(RelativeLayout.ALIGN_BOTTOM, drawerBackGround.getId());
 		drawerTextView.setLayoutParams(drawerTextViewParams);
 		drawerTextView.setGravity(Gravity.LEFT);
 		drawerTextView.setTextColor(Color.WHITE);
@@ -230,12 +218,9 @@ public class MainActivity extends Activity implements FragmentCallBack {
 		RelativeLayout.LayoutParams drawerWeatherPictureImageViewLayoutParams = new android.widget.RelativeLayout.LayoutParams(
 				width * 56 / 360, width * 56 / 360);
 		drawerWeatherPictureImageView.setScaleType(ScaleType.FIT_CENTER);
-		drawerWeatherPictureImageViewLayoutParams.addRule(
-				RelativeLayout.ALIGN_LEFT, drawerTextView.getId());
-		drawerWeatherPictureImageViewLayoutParams.addRule(RelativeLayout.ABOVE,
-				drawerTextView.getId());
-		drawerWeatherPictureImageView
-				.setLayoutParams(drawerWeatherPictureImageViewLayoutParams);
+		drawerWeatherPictureImageViewLayoutParams.addRule(RelativeLayout.ALIGN_LEFT, drawerTextView.getId());
+		drawerWeatherPictureImageViewLayoutParams.addRule(RelativeLayout.ABOVE, drawerTextView.getId());
+		drawerWeatherPictureImageView.setLayoutParams(drawerWeatherPictureImageViewLayoutParams);
 		AssetManager mgr = getAssets();// 得到AssetManager
 		Typeface tf = Typeface.createFromAsset(mgr, "fonts/Roboto-Medium.ttf");// 根据路径得到Typeface
 		drawerContentLayout.addView(drawerBackGround);
@@ -244,8 +229,7 @@ public class MainActivity extends Activity implements FragmentCallBack {
 		initDrawerContent(tf);
 
 		toolBar = new LinearLayout(mContext);
-		toolBar.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,
-				height * 56 / 640));
+		toolBar.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, height * 56 / 640));
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 			toolBar.setPadding(0, ScreenUtils.getStatusHeight(mContext), 0, 0);
 			toolBar.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,
@@ -254,29 +238,24 @@ public class MainActivity extends Activity implements FragmentCallBack {
 		toolBar.setGravity(Gravity.CENTER_VERTICAL);
 		initToolBar();
 		weatherLayout = new LinearLayout(mContext);
-		weatherLayout.setLayoutParams(new LayoutParams(
-				LayoutParams.MATCH_PARENT, height * 584 / 640));
+		weatherLayout.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, height * 584 / 640));
 		weatherLayout.setOrientation(LinearLayout.VERTICAL);
 		weatherLayout.setId(4);
 		fragmentLayout = new LinearLayout(mContext);
 		fragmentLayout.setId(5);
-		fragmentLayout.setLayoutParams(new LayoutParams(ScreenUtils
-				.getScreenWidth(mContext), height * 584 / 640));
+		fragmentLayout.setLayoutParams(new LayoutParams(ScreenUtils.getScreenWidth(mContext), height * 584 / 640));
 		fragmentLayout.setOrientation(LinearLayout.VERTICAL);
 		viewPager = new ViewPager(mContext);
 		viewPager.setId(6);
-		viewPager.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,
-				LayoutParams.MATCH_PARENT));
+		viewPager.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 		toolBar.setX(0);
 		toolBar.setY(0);
 		weatherLayout.setX(0);
 		weatherLayout.setY(height * 56 / 640);
 		fragmentLayout.setY(height * 56 / 640);
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-			weatherLayout.setY(height * 56 / 640
-					+ ScreenUtils.getStatusHeight(mContext));
-			fragmentLayout.setY(height * 56 / 640
-					+ ScreenUtils.getStatusHeight(mContext));
+			weatherLayout.setY(height * 56 / 640 + ScreenUtils.getStatusHeight(mContext));
+			fragmentLayout.setY(height * 56 / 640 + ScreenUtils.getStatusHeight(mContext));
 		}
 		fragmentLayout.setX(ScreenUtils.getScreenWidth(mContext));
 		// progressWheel = new ProgressWheel(mContext);
@@ -287,11 +266,11 @@ public class MainActivity extends Activity implements FragmentCallBack {
 		// progressWheel.setY((float) (height / 2 * 1.2));
 		// progressWheel.setBarWidth(6);
 
-	//	progressWheel.spin();
+		// progressWheel.spin();
 		rootContentLayout.addView(toolBar);
 		rootContentLayout.addView(weatherLayout);
 		rootContentLayout.addView(fragmentLayout);
-		//rootContentLayout.addView(progressWheel);
+		// rootContentLayout.addView(progressWheel);
 		weatherLayout.addView(viewPager);
 		mDrawerLayout.addView(rootContentLayout);
 		mDrawerLayout.addView(drawerContentLayout);
@@ -300,8 +279,7 @@ public class MainActivity extends Activity implements FragmentCallBack {
 
 	private void initToolBar() {
 		ImageView arrow = new ImageView(mContext);
-		LinearLayout.LayoutParams arrowParams = new LinearLayout.LayoutParams(
-				height * 56 / 640, height * 56 / 640);
+		LinearLayout.LayoutParams arrowParams = new LinearLayout.LayoutParams(height * 56 / 640, height * 56 / 640);
 		arrow.setPadding(0, width / 12 * 360, 0, width / 12 * 360);
 		arrow.setScaleType(ScaleType.CENTER);
 		arrow.setImageResource(R.drawable.ic_drawer);
@@ -318,8 +296,8 @@ public class MainActivity extends Activity implements FragmentCallBack {
 			}
 		});
 		TextView title = new TextView(mContext);
-		LinearLayout.LayoutParams titleParams = new LinearLayout.LayoutParams(
-				LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+		LinearLayout.LayoutParams titleParams = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
+				LayoutParams.WRAP_CONTENT);
 		titleParams.setMargins(width * 16 / 360, 0, 0, 0);
 		title.setGravity(Gravity.LEFT);
 		title.setLayoutParams(titleParams);
@@ -332,38 +310,32 @@ public class MainActivity extends Activity implements FragmentCallBack {
 
 	private void initDrawerContent(Typeface tf) {
 		String[] drawerFunctionText = { "查看天气", "城市管理" };
-		int[] drawerFunctionIcon = { R.drawable.ic_wb_sunny_grey600_24dp,
-				R.drawable.ic_location_city_grey600_24dp };
+		int[] drawerFunctionIcon = { R.drawable.ic_wb_sunny_grey600_24dp, R.drawable.ic_location_city_grey600_24dp };
 		LinearLayout drawerFunctionLayout = new LinearLayout(mContext);
 		drawerFunctionLayout.setOrientation(LinearLayout.VERTICAL);
 		RelativeLayout.LayoutParams drawerFunctionLayoutParams = new RelativeLayout.LayoutParams(
 				LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
 		drawerFunctionLayoutParams.setMargins(0, height / 50, 0, 0);
-		drawerFunctionLayoutParams.addRule(RelativeLayout.BELOW,
-				drawerBackGround.getId());
+		drawerFunctionLayoutParams.addRule(RelativeLayout.BELOW, drawerBackGround.getId());
 		drawerFunctionLayout.setLayoutParams(drawerFunctionLayoutParams);
 		for (int i = 0; i < drawerFunctionIcon.length; i++) {
 			LinearLayout drawerFunctionItem = new LinearLayout(mContext);
 			drawerFunctionItem.setGravity(Gravity.CENTER_VERTICAL);
 			drawerFunctionItem.setOrientation(LinearLayout.HORIZONTAL);
-			RelativeLayout.LayoutParams drawerItem_1Params = new RelativeLayout.LayoutParams(
-					LayoutParams.MATCH_PARENT, width * 48 / 360);
-			drawerItem_1Params.addRule(RelativeLayout.BELOW,
-					drawerBackGround.getId());
+			RelativeLayout.LayoutParams drawerItem_1Params = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT,
+					width * 48 / 360);
+			drawerItem_1Params.addRule(RelativeLayout.BELOW, drawerBackGround.getId());
 			drawerFunctionItem.setLayoutParams(drawerItem_1Params);
-			drawerItem_1Params.setMargins(0, width * 16 / 360, 0,
-					width * 8 / 360);
+			drawerItem_1Params.setMargins(0, width * 16 / 360, 0, width * 8 / 360);
 			ImageView drawerFunctionItemImage = new ImageView(mContext);
-			LinearLayout.LayoutParams drawerFunctionItemImageParams = new LinearLayout.LayoutParams(
-					width * 24 / 360, width * 24 / 360);
+			LinearLayout.LayoutParams drawerFunctionItemImageParams = new LinearLayout.LayoutParams(width * 24 / 360,
+					width * 24 / 360);
 			drawerFunctionItemImageParams.setMargins(width * 16 / 360, 0, 0, 0);
-			drawerFunctionItemImage
-					.setLayoutParams(drawerFunctionItemImageParams);
+			drawerFunctionItemImage.setLayoutParams(drawerFunctionItemImageParams);
 			drawerFunctionItemImage.setScaleType(ScaleType.CENTER_CROP);
 			drawerFunctionItemImage.setImageResource(drawerFunctionIcon[i]);
 			final TextView drawerFunctionItemText = new TextView(mContext);
-			drawerFunctionItemText.setLayoutParams(new LayoutParams(
-					LayoutParams.WRAP_CONTENT, height * 24 / 640));
+			drawerFunctionItemText.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, height * 24 / 640));
 			drawerFunctionItemText.setText(drawerFunctionText[i]);
 			drawerFunctionItemText.setTextColor(Color.rgb(150, 150, 150));
 			drawerFunctionItemText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
@@ -377,40 +349,34 @@ public class MainActivity extends Activity implements FragmentCallBack {
 		}
 		drawerContentLayout.addView(drawerFunctionLayout);
 		String[] item1 = { "设置", "关于", "帮助" };
-		int[] item2 = { R.drawable.ic_settings_applications_grey600_24dp,
-				R.drawable.ic_info_grey600_24dp,
+		int[] item2 = { R.drawable.ic_settings_applications_grey600_24dp, R.drawable.ic_info_grey600_24dp,
 				R.drawable.ic_help_grey600_24dp };
 		LinearLayout drawerItemSecondLayout = new LinearLayout(mContext);
 		drawerItemSecondLayout.setOrientation(LinearLayout.VERTICAL);
 		RelativeLayout.LayoutParams drawerItemSecondLayoutParams = new RelativeLayout.LayoutParams(
 				LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-		drawerItemSecondLayoutParams.addRule(
-				RelativeLayout.ALIGN_PARENT_BOTTOM, 1);
+		drawerItemSecondLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 1);
 		drawerItemSecondLayout.setLayoutParams(drawerItemSecondLayoutParams);
 		LinearLayout drawerItem_1Division = new LinearLayout(mContext);
-		drawerItem_1Division.setLayoutParams(new LayoutParams(
-				LayoutParams.MATCH_PARENT, 1));
+		drawerItem_1Division.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, 1));
 		drawerItem_1Division.setBackgroundResource(R.drawable.ic_grey);
 		drawerItemSecondLayout.addView(drawerItem_1Division);
 		for (int i = 0; i < item2.length; i++) {
 			LinearLayout drawer_Item = new LinearLayout(mContext);
 			drawer_Item.setGravity(Gravity.CENTER_VERTICAL);
 			drawer_Item.setOrientation(LinearLayout.HORIZONTAL);
-			LinearLayout.LayoutParams drawer_ItemParams = new LinearLayout.LayoutParams(
-					LayoutParams.MATCH_PARENT, width * 48 / 360);
+			LinearLayout.LayoutParams drawer_ItemParams = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
+					width * 48 / 360);
 			drawer_Item.setLayoutParams(drawer_ItemParams);
 			ImageView drawer_ItemImageView = new ImageView(mContext);
-			LinearLayout.LayoutParams drawer_ItemImageViewLayoutParams = new LinearLayout.LayoutParams(
-					width * 24 / 360, width * 24 / 360);
-			drawer_ItemImageViewLayoutParams.setMargins(width * 16 / 360, 0, 0,
-					0);
-			drawer_ItemImageView
-					.setLayoutParams(drawer_ItemImageViewLayoutParams);
+			LinearLayout.LayoutParams drawer_ItemImageViewLayoutParams = new LinearLayout.LayoutParams(width * 24 / 360,
+					width * 24 / 360);
+			drawer_ItemImageViewLayoutParams.setMargins(width * 16 / 360, 0, 0, 0);
+			drawer_ItemImageView.setLayoutParams(drawer_ItemImageViewLayoutParams);
 			drawer_ItemImageView.setScaleType(ScaleType.CENTER_CROP);
 			drawer_ItemImageView.setImageResource(item2[i]);
 			final TextView drawer_ItemTextView = new TextView(mContext);
-			drawer_ItemTextView.setLayoutParams(new LayoutParams(
-					LayoutParams.WRAP_CONTENT, height * 24 / 640));
+			drawer_ItemTextView.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, height * 24 / 640));
 			drawer_ItemTextView.setText(item1[i]);
 			drawer_ItemTextView.setTextColor(Color.rgb(150, 150, 150));
 			drawer_ItemTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
@@ -435,12 +401,9 @@ public class MainActivity extends Activity implements FragmentCallBack {
 	}
 
 	private boolean isMyServiceRunning(Context context) {
-		ActivityManager manager = (ActivityManager) context
-				.getSystemService(Context.ACTIVITY_SERVICE);
-		for (RunningServiceInfo service : manager
-				.getRunningServices(Integer.MAX_VALUE)) {
-			if ("com.stu.zdy.weather.service.WidgetService"
-					.equals(service.service.getClassName())) {
+		ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+		for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+			if ("com.stu.zdy.weather.service.WidgetService".equals(service.service.getClassName())) {
 				return true;
 			}
 		}
@@ -460,8 +423,8 @@ public class MainActivity extends Activity implements FragmentCallBack {
 				return false;
 			}
 		};
-		mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
-				drawerArrow, R.string.drawer_open, R.string.drawer_close) {
+		mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, drawerArrow, R.string.drawer_open,
+				R.string.drawer_close) {
 			@Override
 			public void onDrawerClosed(View view) {
 				invalidateOptionsMenu();
@@ -493,35 +456,23 @@ public class MainActivity extends Activity implements FragmentCallBack {
 
 	private void sendDataToWidget(JSONObject jsonObject) {
 		try {
-			if (jsonObject.toString().substring(1, 2).equals("{")
-					&& sharedPreferences.getString("defaultCity", "").equals(
-							jsonObject
-									.getJSONArray("HeWeather data service 3.0")
-									.getJSONObject(0).getJSONObject("basic")
-									.getString("city"))) {
+			if (jsonObject.toString().substring(1, 2).equals("{") && sharedPreferences.getString("defaultCity", "")
+					.equals(jsonObject.getJSONArray("HeWeather data service 3.0").getJSONObject(0)
+							.getJSONObject("basic").getString("city"))) {
 				Editor editor = sharedPreferences.edit();
-				forWidgetString = jsonObject
-						.getJSONArray("HeWeather data service 3.0")
-						.getJSONObject(0).getJSONObject("basic")
-						.getString("city")
+				forWidgetString = jsonObject.getJSONArray("HeWeather data service 3.0").getJSONObject(0)
+						.getJSONObject("basic").getString("city")
 						+ ","
-						+ jsonObject.getJSONArray("HeWeather data service 3.0")
-								.getJSONObject(0).getJSONObject("now")
+						+ jsonObject.getJSONArray("HeWeather data service 3.0").getJSONObject(0).getJSONObject("now")
 								.getString("tmp")
 						+ ","
-						+ jsonObject.getJSONArray("HeWeather data service 3.0")
-								.getJSONObject(0).getJSONObject("now")
+						+ jsonObject.getJSONArray("HeWeather data service 3.0").getJSONObject(0).getJSONObject("now")
 								.getJSONObject("cond").getString("txt")
 						+ ","
-						+ jsonObject.getJSONArray("HeWeather data service 3.0")
-								.getJSONObject(0).getJSONObject("basic")
-								.getJSONObject("update").getString("loc")
-								.substring(11, 16)
-						+ "更新"
-						+ ","
-						+ jsonObject.getJSONArray("HeWeather data service 3.0")
-								.getJSONObject(0).getJSONObject("now")
-								.getJSONObject("cond").getString("code");
+						+ jsonObject.getJSONArray("HeWeather data service 3.0").getJSONObject(0).getJSONObject("basic")
+								.getJSONObject("update").getString("loc").substring(11, 16)
+						+ "更新" + "," + jsonObject.getJSONArray("HeWeather data service 3.0").getJSONObject(0)
+								.getJSONObject("now").getJSONObject("cond").getString("code");
 				editor.putString("widget", forWidgetString);
 				editor.commit();
 				Intent intent = new Intent("com.stu.zdy.weather.big");
@@ -541,22 +492,18 @@ public class MainActivity extends Activity implements FragmentCallBack {
 		case 100:
 		case 102:
 		case 103:
-			view.setImageDrawable(getResources().getDrawable(
-					R.drawable.sunny_pencil));
+			view.setImageDrawable(getResources().getDrawable(R.drawable.sunny_pencil));
 			break;
 		case 101:
-			view.setImageDrawable(getResources().getDrawable(
-					R.drawable.cloudy_pencil));
+			view.setImageDrawable(getResources().getDrawable(R.drawable.cloudy_pencil));
 			break;
 		case 104:
-			view.setImageDrawable(getResources().getDrawable(
-					R.drawable.overcast_pencil));
+			view.setImageDrawable(getResources().getDrawable(R.drawable.overcast_pencil));
 			break;
 		case 302:
 		case 303:
 		case 304:
-			view.setImageDrawable(getResources().getDrawable(
-					R.drawable.storm_pencil));
+			view.setImageDrawable(getResources().getDrawable(R.drawable.storm_pencil));
 			break;
 		case 300:
 		case 301:
@@ -569,8 +516,7 @@ public class MainActivity extends Activity implements FragmentCallBack {
 		case 311:
 		case 312:
 		case 313:
-			view.setImageDrawable(getResources().getDrawable(
-					R.drawable.rain_pencil));
+			view.setImageDrawable(getResources().getDrawable(R.drawable.rain_pencil));
 			break;
 		case 400:
 		case 401:
@@ -580,8 +526,7 @@ public class MainActivity extends Activity implements FragmentCallBack {
 		case 405:
 		case 406:
 		case 407:
-			view.setImageDrawable(getResources().getDrawable(
-					R.drawable.snow_pencil));
+			view.setImageDrawable(getResources().getDrawable(R.drawable.snow_pencil));
 			break;
 		default:
 			break;
@@ -620,10 +565,8 @@ public class MainActivity extends Activity implements FragmentCallBack {
 
 	public static boolean checkDeviceHasNavigationBar(Context activity) {
 		// 通过判断设备是否有返回键、菜单键(不是虚拟键,是手机屏幕外的按键)来确定是否有navigation bar
-		boolean hasMenuKey = ViewConfiguration.get(activity)
-				.hasPermanentMenuKey();
-		boolean hasBackKey = KeyCharacterMap
-				.deviceHasKey(KeyEvent.KEYCODE_BACK);
+		boolean hasMenuKey = ViewConfiguration.get(activity).hasPermanentMenuKey();
+		boolean hasBackKey = KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_BACK);
 		if (!hasMenuKey && !hasBackKey) {
 			return true;
 		}
@@ -631,20 +574,14 @@ public class MainActivity extends Activity implements FragmentCallBack {
 	}
 
 	private void showMaterialDialog() {
-		mMaterialDialog = new MaterialDialog(mContext).setTitle("添加城市")
-				.setMessage("理论上支持县及其以上城市").setText("")
+		mMaterialDialog = new MaterialDialog(mContext).setTitle("添加城市").setMessage("理论上支持县及其以上城市").setText("")
 				.setPositiveButton("确定", new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						if (DBManager
-								.getIdByCityName(mMaterialDialog.getText())
-								.equals("")) {
-							Toast.makeText(mContext.getApplicationContext(),
-									"输入有错误", Toast.LENGTH_SHORT).show();
+						if (DBManager.getIdByCityName(mMaterialDialog.getText()).equals("")) {
+							Toast.makeText(mContext.getApplicationContext(), "输入有错误", Toast.LENGTH_SHORT).show();
 						} else {// 输入成功
-							FileUtils.saveCityList(mContext,
-									FileUtils.DataOperate.ADD,
-									mMaterialDialog.getText());
+							FileUtils.saveCityList(mContext, FileUtils.DataOperate.ADD, mMaterialDialog.getText());
 							viewPager.removeAllViews();
 							initViewPager();
 							mMaterialDialog.dismiss();
@@ -665,14 +602,11 @@ public class MainActivity extends Activity implements FragmentCallBack {
 			@Override
 			public void onPageSelected(int arg0) {
 				// TODO Auto-generated method stub
-				((TextView) toolBar.getChildAt(1)).setText(FileUtils
-						.getCityFromJsonArray(mContext,
-								viewPager.getCurrentItem()));
+				((TextView) toolBar.getChildAt(1))
+						.setText(FileUtils.getCityFromJsonArray(mContext, viewPager.getCurrentItem()));
 				try {
-					Log.v("当前标签页的温度", String.valueOf(cityTemperature[viewPager
-							.getCurrentItem()]));
-					setActionbarColor(Integer.valueOf(cityTemperature[viewPager
-							.getCurrentItem()]));
+					Log.v("当前标签页的温度", String.valueOf(cityTemperature[viewPager.getCurrentItem()]));
+					setActionbarColor(Integer.valueOf(cityTemperature[viewPager.getCurrentItem()]));
 				} catch (Exception e) {
 					// TODO: handle exception
 				}
@@ -708,22 +642,15 @@ public class MainActivity extends Activity implements FragmentCallBack {
 			public void onDrawerOpened(View arg0) {
 				// TODO Auto-generated method stub
 				getActionBar().setTitle("质感天气");
-				changeWeatherPicture(Integer.valueOf(cityWeatherArrayList
-						.get(viewPager.getCurrentItem())),
+				changeWeatherPicture(Integer.valueOf(cityWeatherArrayList.get(viewPager.getCurrentItem())),
 						drawerWeatherPictureImageView);
-				drawerTextView.setText(FileUtils.getCityFromJsonArray(mContext,
-						viewPager.getCurrentItem()) + "°");
-				Log.v("抽屉栏的天气文本",
-						FileUtils.getCityFromJsonArray(mContext,
-								viewPager.getCurrentItem())
-								+ "\n"
-								+ cityTemperature[viewPager.getCurrentItem()]
-								+ "°");
+				drawerTextView.setText(FileUtils.getCityFromJsonArray(mContext, viewPager.getCurrentItem()) + "°");
+				Log.v("抽屉栏的天气文本", FileUtils.getCityFromJsonArray(mContext, viewPager.getCurrentItem()) + "\n"
+						+ cityTemperature[viewPager.getCurrentItem()] + "°");
 				((TextView) toolBar.getChildAt(1)).setText("质感天气");
 				if (Integer.valueOf(cityTemperature[viewPager.getCurrentItem()]) > 28) {
 					drawerBackGround.setImageResource(R.drawable.high_temper);
-				} else if (Integer.valueOf(cityTemperature[viewPager
-						.getCurrentItem()]) < 14) {
+				} else if (Integer.valueOf(cityTemperature[viewPager.getCurrentItem()]) < 14) {
 					drawerBackGround.setImageResource(R.drawable.low_temper);
 				} else {
 					drawerBackGround.setImageResource(R.drawable.middle_temper);
@@ -734,9 +661,8 @@ public class MainActivity extends Activity implements FragmentCallBack {
 			public void onDrawerClosed(View arg0) {
 				// TODO Auto-generated method stub
 				if (viewPager != null) {
-					((TextView) toolBar.getChildAt(1)).setText(FileUtils
-							.getCityFromJsonArray(mContext,
-									viewPager.getCurrentItem()));
+					((TextView) toolBar.getChildAt(1))
+							.setText(FileUtils.getCityFromJsonArray(mContext, viewPager.getCurrentItem()));
 				}
 			}
 		});
@@ -754,8 +680,7 @@ public class MainActivity extends Activity implements FragmentCallBack {
 		}
 		if (number == 1) {
 			Intent i = getBaseContext().getPackageManager()
-					.getLaunchIntentForPackage(
-							getBaseContext().getPackageName());
+					.getLaunchIntentForPackage(getBaseContext().getPackageName());
 			i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			startActivity(i);
 		}
@@ -772,8 +697,7 @@ public class MainActivity extends Activity implements FragmentCallBack {
 		if (NetWorkUtils.hasInternetConnection(mContext)) {
 
 			Intent i = getBaseContext().getPackageManager()
-					.getLaunchIntentForPackage(
-							getBaseContext().getPackageName());
+					.getLaunchIntentForPackage(getBaseContext().getPackageName());
 			i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			startActivity(i);
 		} else {
@@ -831,19 +755,16 @@ public class MainActivity extends Activity implements FragmentCallBack {
 				break;
 			case 1:// 城市管理
 				Bundle bundle = new Bundle();
-				bundle.putString("citys", FileUtils.getCityList(mContext)
-						.toString());
+				bundle.putString("citys", FileUtils.getCityList(mContext).toString());
 				if (fragmentManager.findFragmentByTag("cityFragment") == null) {
 					fragmentLayout.setX(0);
 					weatherLayout.setX(ScreenUtils.getScreenWidth(mContext));
 					cityFragment = new ManageCityFragment();
 					cityFragment.setArguments(bundle);
-					fragmentTransaction.replace(fragmentLayout.getId(),
-							cityFragment, "cityFragment");
+					fragmentTransaction.replace(fragmentLayout.getId(), cityFragment, "cityFragment");
 					fragmentTransaction.commit();
 				} else {
-					Toast.makeText(mContext, "已经打开管理城市的列表啦！(｡・`ω´･)",
-							Toast.LENGTH_SHORT).show();
+					Toast.makeText(mContext, "已经打开管理城市的列表啦！(｡・`ω´･)", Toast.LENGTH_SHORT).show();
 				}
 				mDrawerLayout.closeDrawer(drawerContentLayout);
 				break;
@@ -852,8 +773,7 @@ public class MainActivity extends Activity implements FragmentCallBack {
 				weatherLayout.setX(ScreenUtils.getScreenWidth(mContext));
 				if (fragmentManager.findFragmentByTag("settingFragment") == null) {
 					settingFragment = new SettingFragment();
-					fragmentTransaction.replace(fragmentLayout.getId(),
-							settingFragment, "settingFragment");
+					fragmentTransaction.replace(fragmentLayout.getId(), settingFragment, "settingFragment");
 				}
 				fragmentTransaction.commit();
 				mDrawerLayout.closeDrawer(Gravity.LEFT);
@@ -863,8 +783,7 @@ public class MainActivity extends Activity implements FragmentCallBack {
 				weatherLayout.setX(ScreenUtils.getScreenWidth(mContext));
 				if (fragmentManager.findFragmentByTag("infoFragment") == null) {
 					infoFragment = new InfoFragment();
-					fragmentTransaction.replace(fragmentLayout.getId(),
-							infoFragment, "infoFragment");
+					fragmentTransaction.replace(fragmentLayout.getId(), infoFragment, "infoFragment");
 				}
 				fragmentTransaction.commit();
 				mDrawerLayout.closeDrawer(Gravity.LEFT);
@@ -875,8 +794,7 @@ public class MainActivity extends Activity implements FragmentCallBack {
 				weatherLayout.setX(ScreenUtils.getScreenWidth(mContext));
 				if (fragmentManager.findFragmentByTag("helpFragment") == null) {
 					helpFragment = new HelpFragment();
-					fragmentTransaction.replace(fragmentLayout.getId(),
-							helpFragment, "helpFragment");
+					fragmentTransaction.replace(fragmentLayout.getId(), helpFragment, "helpFragment");
 				}
 				fragmentTransaction.commit();
 				mDrawerLayout.closeDrawer(Gravity.LEFT);
@@ -885,5 +803,11 @@ public class MainActivity extends Activity implements FragmentCallBack {
 			}
 		}
 
+	}
+
+	
+	public void onChangeAcitonbar(int temper, int index) {
+		// TODO Auto-generated method stub
+		
 	}
 }

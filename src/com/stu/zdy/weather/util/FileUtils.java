@@ -1,12 +1,12 @@
 package com.stu.zdy.weather.util;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -20,10 +20,8 @@ public class FileUtils {
 		SAVE, ADD, // GET,
 	}
 
-	public static boolean saveCityList(Context context, DataOperate operate,
-			String input) {
-		SharedPreferences sharedPreferences = context.getSharedPreferences(
-				"weather_info", Context.MODE_PRIVATE);
+	public static boolean saveCityList(Context context, DataOperate operate, String input) {
+		SharedPreferences sharedPreferences = context.getSharedPreferences("weather_info", Context.MODE_PRIVATE);
 		if (operate == FileUtils.DataOperate.SAVE) {
 			Editor editor = sharedPreferences.edit();
 			editor.putString("citylist", input);
@@ -31,8 +29,7 @@ public class FileUtils {
 			return true;
 		}
 		if (operate == FileUtils.DataOperate.ADD) {
-			String output = sharedPreferences.getString("citylist",
-					new JSONObject().toString());
+			String output = sharedPreferences.getString("citylist", new JSONObject().toString());
 			JSONObject temp = null;
 			try {
 				temp = new JSONObject(output);
@@ -51,10 +48,8 @@ public class FileUtils {
 	}
 
 	public static JSONObject getCityList(Context context) {
-		SharedPreferences sharedPreferences = context.getSharedPreferences(
-				"weather_info", Context.MODE_PRIVATE);
-		String output = sharedPreferences.getString("citylist",
-				new JSONObject().toString());
+		SharedPreferences sharedPreferences = context.getSharedPreferences("weather_info", Context.MODE_PRIVATE);
+		String output = sharedPreferences.getString("citylist", new JSONObject().toString());
 		try {
 			return new JSONObject(output);
 		} catch (JSONException e) {
@@ -79,8 +74,7 @@ public class FileUtils {
 
 	@SuppressLint("NewApi")
 	public static boolean removeCityFromJsonArray(Context context, int index) {
-		SharedPreferences sharedPreferences = context.getSharedPreferences(
-				"weather_info", Context.MODE_PRIVATE);
+		SharedPreferences sharedPreferences = context.getSharedPreferences("weather_info", Context.MODE_PRIVATE);
 		JSONObject jsonObject = getCityList(context);
 		try {
 			jsonObject.getJSONArray("citylist").remove(index);
@@ -98,8 +92,7 @@ public class FileUtils {
 	public static void write(Context context, String cityName, String data) {
 		// TODO Auto-generated method stub
 		try {
-			FileOutputStream fileOutputStream = context.openFileOutput(
-					cityName, Context.MODE_PRIVATE);
+			FileOutputStream fileOutputStream = context.openFileOutput(cityName, Context.MODE_PRIVATE);
 			PrintStream printStream = new PrintStream(fileOutputStream);
 			printStream.print(data);
 			printStream.close();
@@ -129,5 +122,42 @@ public class FileUtils {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	public boolean deleteDirectory(String filePath) {
+		boolean flag = false;
+		// 如果filePath不以文件分隔符结尾，自动添加文件分隔符
+		if (!filePath.endsWith(File.separator)) {
+			filePath = filePath + File.separator;
+		}
+		File dirFile = new File(filePath);
+		if (!dirFile.exists() || !dirFile.isDirectory()) {
+			return false;
+		}
+		flag = true;
+		File[] files = dirFile.listFiles();
+		// 遍历删除文件夹下的所有文件(包括子目录)
+		for (int i = 0; i < files.length; i++) {
+			if (files[i].isFile()) {
+				// 删除子文件
+				flag = deleteFile(files[i].getAbsolutePath());
+				if (!flag)
+					break;
+			} else {
+				// 删除子目录
+				flag = deleteDirectory(files[i].getAbsolutePath());
+				if (!flag)
+					break;
+			}
+		}
+		return flag;
+	}
+
+	public boolean deleteFile(String filePath) {
+		File file = new File(filePath);
+		if (file.isFile() && file.exists()) {
+			return file.delete();
+		}
+		return false;
 	}
 }

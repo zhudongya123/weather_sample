@@ -385,6 +385,9 @@ containing a value of this type.
         public static final int drawer_close=0x7f090004;
         public static final int drawer_open=0x7f090003;
         public static final int hello_world=0x7f090001;
+        /**  WeatherFragment 
+         */
+        public static final int sever_errror=0x7f090005;
     }
     public static final class style {
         /** 

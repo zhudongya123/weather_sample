@@ -28,7 +28,7 @@ import android.widget.Toast;
 
 import com.stu.zdy.weather.activity.MainActivity;
 import com.stu.zdy.weather.db.DBManager;
-import com.stu.zdy.weather.net.JsonDataAnalysisByHe;
+import com.stu.zdy.weather.net.JsonDataAnalysisByBaidu;
 import com.stu.zdy.weather.service.WidgetService;
 import com.stu.zdy.weather.util.CalendarUtil;
 import com.stu.zdy.weather.util.NetWorkUtils;
@@ -40,20 +40,16 @@ public class BigWeatherWidget extends AppWidgetProvider {
 	private ArrayList<String> arrayList = new ArrayList<String>();
 	private SharedPreferences sharedPreferences;
 	private Context mContext;
-	private String[] weeks = { "����", "��һ", "�ܶ�", "����", "����", "����",
-			"����" };
+	private String[] weeks = { "����", "��һ", "�ܶ�", "����", "����", "����", "����" };
 
 	@Override
-	public void onUpdate(final Context context,
-			AppWidgetManager appWidgetManager, int[] appWidgetIds) {
+	public void onUpdate(final Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
 		// TODO Auto-generated method stub
 		this.mContext = context;
 		runService();
-		sharedPreferences = mContext.getSharedPreferences("citys",
-				Context.MODE_PRIVATE);
+		sharedPreferences = mContext.getSharedPreferences("citys", Context.MODE_PRIVATE);
 		cityName = sharedPreferences.getString("cityName", "����");
-		ClockPackageName = sharedPreferences.getString("packagename",
-				"com.google.android.deskclock");
+		ClockPackageName = sharedPreferences.getString("packagename", "com.google.android.deskclock");
 		if (NetWorkUtils.getConnectedType(context) != -1) {
 			GetInfomationFromNetInBigWidget getInfomationFromNetInWidget = new GetInfomationFromNetInBigWidget();
 			getInfomationFromNetInWidget.execute(cityName);
@@ -72,12 +68,9 @@ public class BigWeatherWidget extends AppWidgetProvider {
 	}
 
 	private boolean isMyServiceRunning(Context context) {
-		ActivityManager manager = (ActivityManager) context
-				.getSystemService(Context.ACTIVITY_SERVICE);
-		for (RunningServiceInfo service : manager
-				.getRunningServices(Integer.MAX_VALUE)) {
-			if ("com.stu.zdy.weather.service.WidgetService"
-					.equals(service.service.getClassName())) {
+		ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+		for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+			if ("com.stu.zdy.weather.service.WidgetService".equals(service.service.getClassName())) {
 				return true;
 			}
 		}
@@ -90,8 +83,7 @@ public class BigWeatherWidget extends AppWidgetProvider {
 		this.mContext = context;
 		runService();
 		Log.v("onReceive", "onReceive");
-		sharedPreferences = mContext.getSharedPreferences("citys",
-				Context.MODE_PRIVATE);
+		sharedPreferences = mContext.getSharedPreferences("citys", Context.MODE_PRIVATE);
 		cityName = sharedPreferences.getString("cityName", "");
 		Log.v("cityName", cityName);
 		if (1 == intent.getIntExtra("index", 0)) {
@@ -148,28 +140,15 @@ public class BigWeatherWidget extends AppWidgetProvider {
 		if (calendar.get(Calendar.MINUTE) < 10) {
 			string = "0" + String.valueOf(calendar.get(Calendar.MINUTE));
 		}
-		views.setTextViewText(R.id.time,
-				String.valueOf(calendar.get(Calendar.HOUR_OF_DAY)) + ":"
-						+ string);
-		views.setTextViewText(
-				R.id.date,
-				String.valueOf(calendar.get(Calendar.MONTH) + 1)
-						+ "��"
-						+ String.valueOf(calendar.get(Calendar.DAY_OF_MONTH)
-								+ "��   "
-								+ weeks[calendar.get(Calendar.DAY_OF_WEEK) - 1]));
+		views.setTextViewText(R.id.time, String.valueOf(calendar.get(Calendar.HOUR_OF_DAY)) + ":" + string);
+		views.setTextViewText(R.id.date, String.valueOf(calendar.get(Calendar.MONTH) + 1) + "��" + String.valueOf(
+				calendar.get(Calendar.DAY_OF_MONTH) + "��   " + weeks[calendar.get(Calendar.DAY_OF_WEEK) - 1]));
 		CalendarUtil calendarUtil = new CalendarUtil();
-		views.setTextViewText(
-				R.id.date_ch,
-				"ũ�� "
-						+ calendarUtil.getChineseMonth(
-								calendar.get(Calendar.YEAR),
-								calendar.get(Calendar.MONTH) + 1,
-								calendar.get(Calendar.DAY_OF_MONTH))
-						+ calendarUtil.getChineseDay(
-								calendar.get(Calendar.YEAR),
-								calendar.get(Calendar.MONTH) + 1,
-								calendar.get(Calendar.DAY_OF_MONTH)));
+		views.setTextViewText(R.id.date_ch,
+				"ũ�� " + calendarUtil.getChineseMonth(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1,
+						calendar.get(Calendar.DAY_OF_MONTH))
+				+ calendarUtil.getChineseDay(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1,
+						calendar.get(Calendar.DAY_OF_MONTH)));
 	}
 
 	/**
@@ -180,14 +159,12 @@ public class BigWeatherWidget extends AppWidgetProvider {
 	 */
 	private void widgetOnClick(Context context, RemoteViews views) {
 		Intent intent = new Intent(context, MainActivity.class);
-		PendingIntent pendingIntent = PendingIntent.getActivity(context, 0,
-				intent, 0);
+		PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
 		views.setOnClickPendingIntent(R.id.weather_ic_big, pendingIntent);
 		try {
 			Intent intent2 = new Intent(Intent.ACTION_MAIN);
 			intent2.addCategory(Intent.CATEGORY_LAUNCHER);
-			ComponentName cn = new ComponentName(ClockPackageName,
-					doStartApplicationWithPackageName(ClockPackageName));
+			ComponentName cn = new ComponentName(ClockPackageName, doStartApplicationWithPackageName(ClockPackageName));
 			intent2.setComponent(cn);
 			pendingIntent = PendingIntent.getActivity(context, 0, intent2, 0);
 			views.setOnClickPendingIntent(R.id.time, pendingIntent);
@@ -209,10 +186,8 @@ public class BigWeatherWidget extends AppWidgetProvider {
 	 */
 	private void bildview(int kind, JSONObject jsonObject) {
 		// TODO Auto-generated method stub
-		RemoteViews views = new RemoteViews(mContext.getPackageName(),
-				R.layout.bigwidget);
-		sharedPreferences = mContext.getSharedPreferences("weather_info",
-				Context.MODE_PRIVATE);
+		RemoteViews views = new RemoteViews(mContext.getPackageName(), R.layout.bigwidget);
+		sharedPreferences = mContext.getSharedPreferences("weather_info", Context.MODE_PRIVATE);
 		Editor editor = sharedPreferences.edit();
 		if (kind == 1) {
 
@@ -221,20 +196,15 @@ public class BigWeatherWidget extends AppWidgetProvider {
 			// if֮��Ĵ�������������������������������
 			// ��������ʱ��ֱ�Ӵ���ѡ���л�ȡ���ݣ�������ʱ������Ϊ�ոս����ݱ��������磬
 			// �ٴ���ѡ���ȡ�����ݣ����������ͬ
-			Bundle bundle = new JsonDataAnalysisByHe(jsonObject).getBundle();// ��������
+			Bundle bundle = new JsonDataAnalysisByBaidu(jsonObject.toString()).getBundle();// ��������
 			Log.v("���յ���ʲô����", jsonObject.toString());
 			if (bundle.getString("status").equals("ok")) {// ������������������
 				editor.putString(
 						// �洢������
 						"widget",
-						bundle.getStringArrayList("item1").get(0)
-								+ ","
-								+ bundle.getStringArrayList("item1").get(6)
-								+ ","
-								+ bundle.getStringArrayList("item1").get(3)
-								+ ","
-								+ bundle.getStringArrayList("item1").get(2)
-										.substring(11, 16) + "����" + ","
+						bundle.getStringArrayList("item1").get(0) + "," + bundle.getStringArrayList("item1").get(6)
+								+ "," + bundle.getStringArrayList("item1").get(3) + ","
+								+ bundle.getStringArrayList("item1").get(2).substring(11, 16) + "����" + ","
 								+ bundle.getStringArrayList("item1").get(7));
 				editor.commit();
 			}
@@ -258,10 +228,8 @@ public class BigWeatherWidget extends AppWidgetProvider {
 		FreshTime(mContext, views);// ˢ��ʱ���Ƕ�Ҫ����
 		widgetOnClick(mContext, views);// �����¼�Ҳ�Ƕ�Ҫ����
 		changeWidgetPicture(views);// ˢ��ͼƬҲ�Ƕ�Ҫ����
-		ComponentName thisWidget = new ComponentName(mContext,
-				BigWeatherWidget.class);
-		AppWidgetManager.getInstance(mContext).updateAppWidget(thisWidget,
-				views);
+		ComponentName thisWidget = new ComponentName(mContext, BigWeatherWidget.class);
+		AppWidgetManager.getInstance(mContext).updateAppWidget(thisWidget, views);
 	}
 
 	/**
@@ -275,22 +243,18 @@ public class BigWeatherWidget extends AppWidgetProvider {
 		case 100:
 		case 102:
 		case 103:
-			views.setImageViewResource(R.id.weather_ic_big,
-					R.drawable.sunny_pencil);
+			views.setImageViewResource(R.id.weather_ic_big, R.drawable.sunny_pencil);
 			break;
 		case 101:
-			views.setImageViewResource(R.id.weather_ic_big,
-					R.drawable.cloudy_pencil);
+			views.setImageViewResource(R.id.weather_ic_big, R.drawable.cloudy_pencil);
 			break;
 		case 104:
-			views.setImageViewResource(R.id.weather_ic_big,
-					R.drawable.overcast_pencil);
+			views.setImageViewResource(R.id.weather_ic_big, R.drawable.overcast_pencil);
 			break;
 		case 302:
 		case 303:
 		case 304:
-			views.setImageViewResource(R.id.weather_ic_big,
-					R.drawable.storm_pencil);
+			views.setImageViewResource(R.id.weather_ic_big, R.drawable.storm_pencil);
 			break;
 		case 301:
 		case 305:
@@ -302,8 +266,7 @@ public class BigWeatherWidget extends AppWidgetProvider {
 		case 311:
 		case 312:
 		case 313:
-			views.setImageViewResource(R.id.weather_ic_big,
-					R.drawable.rain_pencil);
+			views.setImageViewResource(R.id.weather_ic_big, R.drawable.rain_pencil);
 			break;
 		case 400:
 		case 401:
@@ -313,8 +276,7 @@ public class BigWeatherWidget extends AppWidgetProvider {
 		case 405:
 		case 406:
 		case 407:
-			views.setImageViewResource(R.id.weather_ic_big,
-					R.drawable.snow_pencil);
+			views.setImageViewResource(R.id.weather_ic_big, R.drawable.snow_pencil);
 			break;
 		default:
 			break;
@@ -332,8 +294,7 @@ public class BigWeatherWidget extends AppWidgetProvider {
 		// ͨ��������ȡ��APP��ϸ��Ϣ������Activities��services��versioncode��name�ȵ�
 		PackageInfo packageinfo = null;
 		try {
-			packageinfo = mContext.getPackageManager().getPackageInfo(
-					packagename, 0);
+			packageinfo = mContext.getPackageManager().getPackageInfo(packagename, 0);
 		} catch (NameNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -346,8 +307,7 @@ public class BigWeatherWidget extends AppWidgetProvider {
 		resolveIntent.setPackage(packageinfo.packageName);
 
 		// ͨ��getPackageManager()��queryIntentActivities��������
-		List<ResolveInfo> resolveinfoList = mContext.getPackageManager()
-				.queryIntentActivities(resolveIntent, 0);
+		List<ResolveInfo> resolveinfoList = mContext.getPackageManager().queryIntentActivities(resolveIntent, 0);
 
 		ResolveInfo resolveinfo = resolveinfoList.iterator().next();
 		if (resolveinfo != null) {
@@ -364,16 +324,14 @@ public class BigWeatherWidget extends AppWidgetProvider {
 	 * @author Zdy
 	 * 
 	 */
-	class GetInfomationFromNetInBigWidget extends
-			AsyncTask<String, String, String> {
+	class GetInfomationFromNetInBigWidget extends AsyncTask<String, String, String> {
 
 		@Override
 		protected String doInBackground(String... params) {
 			// TODO Auto-generated method stub
 			Log.d("widget+doInBackground", "widget+doInBackground");
 
-			String httpUrl = "https://api.heweather.com/x3/weather?cityid="
-					+ DBManager.getIdByCityName(params[0])
+			String httpUrl = "https://api.heweather.com/x3/weather?cityid=" + DBManager.getIdByCityName(params[0])
 					+ "&key=57efa20515e94db68ae042319463dba4";
 			String jsonResult = NetWorkUtils.request(httpUrl);
 			return jsonResult;

@@ -1,5 +1,5 @@
 package com.stu.zdy.weather.interfaces;
 
 public interface WeatherCallBack {
-	void onUpdate();
+	void onUpdate(String result);
 }
