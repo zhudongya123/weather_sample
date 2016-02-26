@@ -7,6 +7,24 @@
     <string name="drawer_open">drawer_open</string>
     <string name="drawer_close">drawer_close</string>
 
+    <!-- MyApplication -->
+    <string name="loading_app">正在初始化应用...</string>
+
     <!-- WeatherFragment -->
-    <string name="sever_errror">数据提供方出现问题</string>
+    <string name="sever_error">数据提供方出现问题</string>
+
+    <!-- AppWidgetProvider -->
+    <string name="small_provider_name">质感天气（2 x 1）</string>
+    <string name="big_provider_name">质感天气（4 x 2）</string>
+
+    <string-array name="week">
+        <item>周日</item>
+        <item>周一</item>
+        <item>周二</item>
+        <item>周三</item>
+        <item>周四</item>
+        <item>周五</item>
+        <item>周六</item>
+    </string-array>
+
 </resources>

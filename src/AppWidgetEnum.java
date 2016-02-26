@@ -1,0 +1,4 @@
+
+public enum AppWidgetEnum {
+	REFRESH_TIME, REFRESH_DATA_BIG, REFRESH_DATA_SMALL;
+}

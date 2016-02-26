@@ -40,7 +40,7 @@ public class BigWeatherWidget extends AppWidgetProvider {
 	private ArrayList<String> arrayList = new ArrayList<String>();
 	private SharedPreferences sharedPreferences;
 	private Context mContext;
-	private String[] weeks = { "����", "��һ", "�ܶ�", "����", "����", "����", "����" };
+	private String[] weeks;
 
 	@Override
 	public void onUpdate(final Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
@@ -61,10 +61,11 @@ public class BigWeatherWidget extends AppWidgetProvider {
 	@Override
 	public void onEnabled(Context context) {
 		// TODO Auto-generated method stub
+		super.onEnabled(context);
 		Log.v("onEnabled", "onEnabled");
 		this.mContext = context;
 		runService();
-		super.onEnabled(context);
+		weeks = context.getResources().getStringArray(R.array.week);
 	}
 
 	private boolean isMyServiceRunning(Context context) {
@@ -87,11 +88,9 @@ public class BigWeatherWidget extends AppWidgetProvider {
 		cityName = sharedPreferences.getString("cityName", "");
 		Log.v("cityName", cityName);
 		if (1 == intent.getIntExtra("index", 0)) {
-			Log.v("����ˢ��", "����ˢ��");
 			bildview(0, null);
 		}
 		if (12 == intent.getIntExtra("index", 0)) {
-			Log.v("����ˢ��", "����ˢ��");
 			if (NetWorkUtils.getConnectedType(context) != -1) {
 				Log.v("cityname", cityName);
 				Toast.makeText(mContext, "����ˢ��", Toast.LENGTH_SHORT).show();
@@ -108,7 +107,6 @@ public class BigWeatherWidget extends AppWidgetProvider {
 	private void runService() {
 		// TODO Auto-generated method stub
 		if (!isMyServiceRunning(mContext)) {
-			Log.v("����δ����", "��������");
 			Intent intent2 = new Intent(mContext, WidgetService.class);
 			mContext.startService(intent2);
 		}
@@ -131,7 +129,7 @@ public class BigWeatherWidget extends AppWidgetProvider {
 	/**
 	 * @param context
 	 * @param views
-	 *            ˢ��ʱ��
+	 * 
 	 * 
 	 */
 	private void FreshTime(Context context, RemoteViews views) {
@@ -152,7 +150,7 @@ public class BigWeatherWidget extends AppWidgetProvider {
 	}
 
 	/**
-	 * ����¼����� �������˹㲥
+	 * 
 	 * 
 	 * @param context
 	 * @param views
@@ -191,17 +189,10 @@ public class BigWeatherWidget extends AppWidgetProvider {
 		Editor editor = sharedPreferences.edit();
 		if (kind == 1) {
 
-			// ����ˢ��
-			// �߼�����Ҫ����ˢ��ʱ���ӷ�������ȡ���ݺ󣬽����������ݴ洢����ѡ��֮��
-			// if֮��Ĵ�������������������������������
-			// ��������ʱ��ֱ�Ӵ���ѡ���л�ȡ���ݣ�������ʱ������Ϊ�ոս����ݱ��������磬
-			// �ٴ���ѡ���ȡ�����ݣ����������ͬ
-			Bundle bundle = new JsonDataAnalysisByBaidu(jsonObject.toString()).getBundle();// ��������
+			Bundle bundle = new JsonDataAnalysisByBaidu(jsonObject.toString()).getBundle();
 			Log.v("���յ���ʲô����", jsonObject.toString());
-			if (bundle.getString("status").equals("ok")) {// ������������������
-				editor.putString(
-						// �洢������
-						"widget",
+			if (bundle.getString("status").equals("ok")) {
+				editor.putString("widget",
 						bundle.getStringArrayList("item1").get(0) + "," + bundle.getStringArrayList("item1").get(6)
 								+ "," + bundle.getStringArrayList("item1").get(3) + ","
 								+ bundle.getStringArrayList("item1").get(2).substring(11, 16) + "����" + ","
@@ -210,7 +201,6 @@ public class BigWeatherWidget extends AppWidgetProvider {
 			}
 		}
 		arrayList.clear();
-		// �ָ����ݣ�������ȥ�����Ÿ���ArrayList
 		String widgetdata = sharedPreferences.getString("widget", "");
 		Log.v("ȡ�����ݣ�", widgetdata);
 		int j = 0;
@@ -233,7 +223,7 @@ public class BigWeatherWidget extends AppWidgetProvider {
 	}
 
 	/**
-	 * ����������icon
+	 *
 	 * 
 	 * @param views
 	 */
@@ -284,14 +274,12 @@ public class BigWeatherWidget extends AppWidgetProvider {
 	}
 
 	/**
-	 * ͨ��������ȡӦ�ó����Ĭ��Activity
 	 * 
 	 * @param packagename
 	 * @return
 	 */
 	private String doStartApplicationWithPackageName(String packagename) {
 
-		// ͨ��������ȡ��APP��ϸ��Ϣ������Activities��services��versioncode��name�ȵ�
 		PackageInfo packageinfo = null;
 		try {
 			packageinfo = mContext.getPackageManager().getPackageInfo(packagename, 0);
@@ -301,12 +289,10 @@ public class BigWeatherWidget extends AppWidgetProvider {
 		if (packageinfo == null) {
 			return "";
 		}
-		// ����һ�����ΪCATEGORY_LAUNCHER�ĸð�����Intent
 		Intent resolveIntent = new Intent(Intent.ACTION_MAIN, null);
 		resolveIntent.addCategory(Intent.CATEGORY_LAUNCHER);
 		resolveIntent.setPackage(packageinfo.packageName);
 
-		// ͨ��getPackageManager()��queryIntentActivities��������
 		List<ResolveInfo> resolveinfoList = mContext.getPackageManager().queryIntentActivities(resolveIntent, 0);
 
 		ResolveInfo resolveinfo = resolveinfoList.iterator().next();
@@ -319,7 +305,6 @@ public class BigWeatherWidget extends AppWidgetProvider {
 	}
 
 	/**
-	 * �첽�࣬����������ȡ����
 	 * 
 	 * @author Zdy
 	 * 

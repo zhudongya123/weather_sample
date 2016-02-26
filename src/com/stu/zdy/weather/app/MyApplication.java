@@ -10,6 +10,7 @@ import android.content.SharedPreferences.Editor;
 import android.widget.Toast;
 
 import com.stu.zdy.weather.db.DBManager;
+import com.stu.zdy.weather_sample.R;
 
 public class MyApplication extends Application {
 	public Context context;
@@ -25,12 +26,11 @@ public class MyApplication extends Application {
 		// TODO Auto-generated method stub
 		super.onCreate();
 		context = this;
-		sharedPreferences = this.getSharedPreferences("weather_info",
-				Context.MODE_PRIVATE);
+		sharedPreferences = this.getSharedPreferences("weather_info", Context.MODE_PRIVATE);
 		editor = sharedPreferences.edit();
 		runTimes = sharedPreferences.getInt("runtimes", 1);
 		if (runTimes == 1) {
-			Toast.makeText(context, "正在初始化应用...", Toast.LENGTH_SHORT).show();
+			Toast.makeText(context, this.getResources().getString(R.string.loading_app), Toast.LENGTH_SHORT).show();
 			DBManager.copyDataBaseFromRaw(context);
 			editor.putBoolean("moreColor", true);
 			editor.putInt("refreshTime", 28800000);
@@ -39,8 +39,7 @@ public class MyApplication extends Application {
 			editor.putString("clockPackageName", "com.google.android.deskclock");
 			editor.putInt("runtimes", 2);
 			try {
-				editor.putString("citylist", new JSONObject("{citylist:["
-						+ "]}").toString());
+				editor.putString("citylist", new JSONObject("{citylist:[" + "]}").toString());
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

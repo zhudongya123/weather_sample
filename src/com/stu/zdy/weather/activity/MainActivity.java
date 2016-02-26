@@ -1,6 +1,7 @@
 package com.stu.zdy.weather.activity;
 
 import java.util.ArrayList;
+import java.util.Hashtable;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -22,6 +23,7 @@ import com.stu.zdy.weather.util.NetWorkUtils;
 import com.stu.zdy.weather.util.ScreenUtils;
 import com.stu.zdy.weather_sample.R;
 
+import android.R.integer;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ActivityManager;
@@ -67,10 +69,7 @@ import android.widget.Toast;
 public class MainActivity extends Activity implements FragmentCallBack {
 
 	private Context mContext;
-	private int height, width;
-	private String[] cityTemperature = { "", "", "", "", "", "", "", "", "" };
 	private DrawerLayout mDrawerLayout;// 抽屉布局
-
 	private AbsoluteLayout rootContentLayout;// 根内容布局
 	private RelativeLayout drawerContentLayout;// 抽屉根布局
 	private LinearLayout toolBar;
@@ -82,16 +81,12 @@ public class MainActivity extends Activity implements FragmentCallBack {
 	private ViewPager viewPager;
 	private FragmentManager fragmentManager;
 	private FragmentTransaction fragmentTransaction;
-	private ArrayList<Fragment> fragments;
 
-	private String forWidgetString;
 	private SharedPreferences sharedPreferences;
-	private int cityNumber;
 	private ImageView drawerBackGround;
 	private ImageView drawerWeatherPictureImageView;
 	private TextView drawerTextView;
 	private MaterialDialog mMaterialDialog;
-	private ArrayList<String> cityWeatherArrayList = new ArrayList<String>();
 
 	private ManageCityFragment cityFragment;
 	private SettingFragment settingFragment;
@@ -99,6 +94,12 @@ public class MainActivity extends Activity implements FragmentCallBack {
 	private HelpFragment helpFragment;
 
 	private JSONObject citylist;
+	private int height, width;
+	private int cityNumber;
+	private String forWidgetString;
+	private ArrayList<String> cityWeatherArrayList = new ArrayList<String>();
+	private ArrayList<Fragment> fragments;
+	private Hashtable<Integer, Integer> citysCurrentTemper = new Hashtable<Integer, Integer>();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -131,7 +132,7 @@ public class MainActivity extends Activity implements FragmentCallBack {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		//runService();
+		// runService();
 	}
 
 	/**
@@ -166,6 +167,7 @@ public class MainActivity extends Activity implements FragmentCallBack {
 				WeatherFragment weatherFragment = new WeatherFragment();
 				Bundle bundle = new Bundle();
 				bundle.putString("city", city);// 将城市名称传递给fragment
+				bundle.putInt("index", i);
 				weatherFragment.setArguments(bundle);
 				fragments.add(weatherFragment);
 			}
@@ -180,6 +182,7 @@ public class MainActivity extends Activity implements FragmentCallBack {
 			Toast.makeText(mContext, "城市太多啦！为了不让机器造成卡顿，请自行左右滑动", Toast.LENGTH_SHORT).show();
 		}
 		// adapter.notifyDataSetChanged();
+		setViewListener();
 	}
 
 	private void initUI() {
@@ -440,7 +443,7 @@ public class MainActivity extends Activity implements FragmentCallBack {
 		mDrawerToggle.syncState();
 	}
 
-	private void setActionbarColor(int arg0) {
+	public void setActionbarColor(int arg0) {
 		if (arg0 > 30) {
 			toolBar.setBackgroundResource(R.drawable.hot);
 		} else if (arg0 > 24) {
@@ -604,9 +607,16 @@ public class MainActivity extends Activity implements FragmentCallBack {
 				// TODO Auto-generated method stub
 				((TextView) toolBar.getChildAt(1))
 						.setText(FileUtils.getCityFromJsonArray(mContext, viewPager.getCurrentItem()));
+				// try {
+				// Log.v("当前标签页的温度",
+				// String.valueOf(cityTemperature[viewPager.getCurrentItem()]));
+				// setActionbarColor(Integer.valueOf(cityTemperature[viewPager.getCurrentItem()]));
+				// } catch (Exception e) {
+				// // TODO: handle exception
+				// }
 				try {
-					Log.v("当前标签页的温度", String.valueOf(cityTemperature[viewPager.getCurrentItem()]));
-					setActionbarColor(Integer.valueOf(cityTemperature[viewPager.getCurrentItem()]));
+
+					setActionbarColor(citysCurrentTemper.get(arg0));
 				} catch (Exception e) {
 					// TODO: handle exception
 				}
@@ -642,28 +652,32 @@ public class MainActivity extends Activity implements FragmentCallBack {
 			public void onDrawerOpened(View arg0) {
 				// TODO Auto-generated method stub
 				getActionBar().setTitle("质感天气");
-				changeWeatherPicture(Integer.valueOf(cityWeatherArrayList.get(viewPager.getCurrentItem())),
-						drawerWeatherPictureImageView);
-				drawerTextView.setText(FileUtils.getCityFromJsonArray(mContext, viewPager.getCurrentItem()) + "°");
-				Log.v("抽屉栏的天气文本", FileUtils.getCityFromJsonArray(mContext, viewPager.getCurrentItem()) + "\n"
-						+ cityTemperature[viewPager.getCurrentItem()] + "°");
-				((TextView) toolBar.getChildAt(1)).setText("质感天气");
-				if (Integer.valueOf(cityTemperature[viewPager.getCurrentItem()]) > 28) {
-					drawerBackGround.setImageResource(R.drawable.high_temper);
-				} else if (Integer.valueOf(cityTemperature[viewPager.getCurrentItem()]) < 14) {
-					drawerBackGround.setImageResource(R.drawable.low_temper);
-				} else {
-					drawerBackGround.setImageResource(R.drawable.middle_temper);
-				}
+				// changeWeatherPicture(Integer.valueOf(cityWeatherArrayList.get(viewPager.getCurrentItem())),
+				// drawerWeatherPictureImageView);
+				// drawerTextView.setText(FileUtils.getCityFromJsonArray(mContext,
+				// viewPager.getCurrentItem()) + "°");
+				// ((TextView) toolBar.getChildAt(1)).setText("质感天气");
+				// if
+				// (Integer.valueOf(cityTemperature[viewPager.getCurrentItem()])
+				// > 28) {
+				// drawerBackGround.setImageResource(R.drawable.high_temper);
+				// } else if
+				// (Integer.valueOf(cityTemperature[viewPager.getCurrentItem()])
+				// < 14) {
+				// drawerBackGround.setImageResource(R.drawable.low_temper);
+				// } else {
+				// drawerBackGround.setImageResource(R.drawable.middle_temper);
+				// }
 			}
 
 			@Override
 			public void onDrawerClosed(View arg0) {
 				// TODO Auto-generated method stub
-				if (viewPager != null) {
-					((TextView) toolBar.getChildAt(1))
-							.setText(FileUtils.getCityFromJsonArray(mContext, viewPager.getCurrentItem()));
-				}
+				// if (viewPager != null) {
+				// ((TextView) toolBar.getChildAt(1))
+				// .setText(FileUtils.getCityFromJsonArray(mContext,
+				// viewPager.getCurrentItem()));
+				// }
 			}
 		});
 	}
@@ -805,9 +819,8 @@ public class MainActivity extends Activity implements FragmentCallBack {
 
 	}
 
-	
 	public void onChangeAcitonbar(int temper, int index) {
 		// TODO Auto-generated method stub
-		
+		citysCurrentTemper.put(index, temper);
 	}
 }

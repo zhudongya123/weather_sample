@@ -102,7 +102,7 @@ public class WeatherFragment extends Fragment {
 					if (bundle.getString("status").equals("ok")) {
 						updataView(bundle);
 					} else {
-						Toast.makeText(getActivity(), getResources().getString(R.string.sever_errror),
+						Toast.makeText(getActivity(), getResources().getString(R.string.sever_error),
 								Toast.LENGTH_SHORT).show();
 					}
 				}
@@ -130,7 +130,7 @@ public class WeatherFragment extends Fragment {
 			updataView(bundle);
 		} else {
 			// TODO Auto-generated method stub
-			Toast.makeText(getActivity(), getResources().getString(R.string.sever_errror), Toast.LENGTH_SHORT).show();
+			Toast.makeText(getActivity(), getResources().getString(R.string.sever_error), Toast.LENGTH_SHORT).show();
 
 		}
 	}
@@ -348,8 +348,12 @@ public class WeatherFragment extends Fragment {
 		currentTemperature.setText(item1.get(6) + "°");
 		todayWeatherDetail.setText(item1.get(0) + "\n" + item1.get(2).substring(11, 16) + "刷新" + "\n" + item1.get(3)
 				+ "\n" + "湿度:" + item1.get(4) + "°" + "\n" + item1.get(5) + "\n" + "紫外线强度:" + item1.get(8));
-
-	//	((MainActivity) getActivity()).onChange(temper, index);
+		
+		((MainActivity) getActivity()).onChangeAcitonbar(Integer.valueOf(item1.get(6)), getArguments().getInt("index"));
+		if (getArguments().getInt("index")==0) {
+			((MainActivity) getActivity()).setActionbarColor(Integer.valueOf(item1.get(6)));
+			
+		}
 		for (int i = 0; i < 10; i++) {
 			temperatureDatas[i] = Integer.valueOf(item2.get(i));
 		}
