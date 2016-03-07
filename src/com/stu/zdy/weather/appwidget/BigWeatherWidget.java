@@ -1,129 +1,130 @@
 package com.stu.zdy.weather.appwidget;
 
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.app.ActivityManager;
-import android.app.ActivityManager.RunningServiceInfo;
+import com.stu.zdy.weather.ui.MainActivity;
+import com.stu.zdy.weather.app.MyApplication;
+import com.stu.zdy.weather.interfaces.WeatherCallBack;
+import com.stu.zdy.weather.mananger.SharePreferenceMananger;
+import com.stu.zdy.weather.net.JsonDataAnalysisByBaidu;
+import com.stu.zdy.weather.util.ApplicationUtils;
+import com.stu.zdy.weather.util.CalendarUtil;
+import com.stu.zdy.weather.util.NetWorkUtils;
+import com.stu.zdy.weather.util.OkHttpUtils;
+import com.stu.zdy.weather_sample.R;
+
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager.NameNotFoundException;
-import android.content.pm.ResolveInfo;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
-import com.stu.zdy.weather.activity.MainActivity;
-import com.stu.zdy.weather.db.DBManager;
-import com.stu.zdy.weather.net.JsonDataAnalysisByBaidu;
-import com.stu.zdy.weather.service.WidgetService;
-import com.stu.zdy.weather.util.CalendarUtil;
-import com.stu.zdy.weather.util.NetWorkUtils;
-import com.stu.zdy.weather_sample.R;
-
 public class BigWeatherWidget extends AppWidgetProvider {
-	private static String ClockPackageName = "com.google.android.deskclock";
-	private String cityName = "";
-	private ArrayList<String> arrayList = new ArrayList<String>();
-	private SharedPreferences sharedPreferences;
-	private Context mContext;
-	private String[] weeks;
+	private static String ClockPackageName = null;
+	private String cityName = null;
 
-	@Override
-	public void onUpdate(final Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-		// TODO Auto-generated method stub
-		this.mContext = context;
-		runService();
-		sharedPreferences = mContext.getSharedPreferences("citys", Context.MODE_PRIVATE);
-		cityName = sharedPreferences.getString("cityName", "����");
-		ClockPackageName = sharedPreferences.getString("packagename", "com.google.android.deskclock");
-		if (NetWorkUtils.getConnectedType(context) != -1) {
-			GetInfomationFromNetInBigWidget getInfomationFromNetInWidget = new GetInfomationFromNetInBigWidget();
-			getInfomationFromNetInWidget.execute(cityName);
+	private Context mContext = null;
+	private String[] weeks = null;
+	private RemoteViews views = null;
+
+	private Timer timer = null;
+	private TimerTask task = null;
+
+	private void initData(Context context) {
+		mContext = context.getApplicationContext();
+		if (weeks == null) {
+			weeks = context.getResources().getStringArray(R.array.week);
 		}
-		Log.v("onUpdate", "onUpdate");
-		super.onUpdate(context, appWidgetManager, appWidgetIds);
+		if (views == null) {
+			views = new RemoteViews(mContext.getPackageName(), R.layout.bigwidget);
+		}
+		cityName = SharePreferenceMananger.getSharePreferenceFromString(mContext, "weather_info", "currentCity");
+		ClockPackageName = SharePreferenceMananger.getSharePreferenceFromString(mContext, "weather_info",
+				"packagename");
 	}
 
-	@Override
-	public void onEnabled(Context context) {
-		// TODO Auto-generated method stub
-		super.onEnabled(context);
-		Log.v("onEnabled", "onEnabled");
-		this.mContext = context;
-		runService();
-		weeks = context.getResources().getStringArray(R.array.week);
+	private void initView(Context context) {
+		runTimerTask(1);
+		prepareHttpRequest();
+		widgetOnClick(context);
 	}
 
-	private boolean isMyServiceRunning(Context context) {
-		ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-		for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-			if ("com.stu.zdy.weather.service.WidgetService".equals(service.service.getClassName())) {
-				return true;
-			}
+	private void runTimerTask(int type) {
+		Log.v("BigWeatherWidget", "runTimerTask");
+		if (type == 1) {
+			timer = new Timer();
+			task = new TimerTask() {
+
+				@Override
+				public void run() {
+					// TODO Auto-generated method stub
+					updateTimeView(mContext);
+				}
+			};
+			task.run();
+			timer.schedule(task, Calendar.getInstance().getTime(), 60000);
+
+		} else {
+			timer.cancel();
+			task.cancel();
+			timer = null;
+			task = null;
 		}
-		return false;
 	}
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		// TODO Auto-generated method stub
-		this.mContext = context;
-		runService();
-		Log.v("onReceive", "onReceive");
-		sharedPreferences = mContext.getSharedPreferences("citys", Context.MODE_PRIVATE);
-		cityName = sharedPreferences.getString("cityName", "");
-		Log.v("cityName", cityName);
-		if (1 == intent.getIntExtra("index", 0)) {
-			bildview(0, null);
-		}
-		if (12 == intent.getIntExtra("index", 0)) {
-			if (NetWorkUtils.getConnectedType(context) != -1) {
-				Log.v("cityname", cityName);
-				Toast.makeText(mContext, "����ˢ��", Toast.LENGTH_SHORT).show();
-				GetInfomationFromNetInBigWidget getInfomationFromNetInWidget = new GetInfomationFromNetInBigWidget();
-				getInfomationFromNetInWidget.execute(cityName);
-			}
-		}
 		super.onReceive(context, intent);
-	}
 
-	/**
-	 * �жϷ����Ƿ�����
-	 */
-	private void runService() {
-		// TODO Auto-generated method stub
-		if (!isMyServiceRunning(mContext)) {
-			Intent intent2 = new Intent(mContext, WidgetService.class);
-			mContext.startService(intent2);
-		}
+		Log.v("BigWeatherWidget", "onReceive");
+		initData(context);
+		initView(context);
+
+		ApplicationUtils.runService(mContext);
 	}
 
 	@Override
 	public void onDisabled(Context context) {
-		// TODO Auto-generated method stub
 		super.onDisabled(context);
-		Log.v("onDisabled", "onDisabled");
+		Log.v("BigWeatherWidget", "onDisabled");
 	}
 
 	@Override
 	public void onDeleted(Context context, int[] appWidgetIds) {
-		// TODO Auto-generated method stub
 		super.onDeleted(context, appWidgetIds);
-		Log.v("onDeleted", "onDeleted");
+		Log.v("BigWeatherWidget", "onDeleted");
+		runTimerTask(0);
+	}
+
+	private void prepareHttpRequest() {
+		Log.v("BigWeatherWidget", "prepareHttpRequest");
+		if (NetWorkUtils.getConnectedType(mContext) != -1) {
+			OkHttpUtils okHttpUtils = new OkHttpUtils(new WeatherCallBack() {
+
+				@Override
+				public void onUpdate(String result) {
+					// TODO Auto-generated method stub
+					try {
+						updateWeatherView(new JSONObject(result));
+					} catch (JSONException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			});
+			okHttpUtils.run(new Handler(), cityName);
+		}
 	}
 
 	/**
@@ -132,21 +133,28 @@ public class BigWeatherWidget extends AppWidgetProvider {
 	 * 
 	 * 
 	 */
-	private void FreshTime(Context context, RemoteViews views) {
+	private void updateTimeView(Context context) {
+		Log.v("BigWeatherWidget", "updateTimeView");
 		Calendar calendar = Calendar.getInstance();
 		String string = String.valueOf(calendar.get(Calendar.MINUTE));
 		if (calendar.get(Calendar.MINUTE) < 10) {
 			string = "0" + String.valueOf(calendar.get(Calendar.MINUTE));
 		}
 		views.setTextViewText(R.id.time, String.valueOf(calendar.get(Calendar.HOUR_OF_DAY)) + ":" + string);
-		views.setTextViewText(R.id.date, String.valueOf(calendar.get(Calendar.MONTH) + 1) + "��" + String.valueOf(
-				calendar.get(Calendar.DAY_OF_MONTH) + "��   " + weeks[calendar.get(Calendar.DAY_OF_WEEK) - 1]));
+		views.setTextViewText(R.id.date,
+				String.valueOf(calendar.get(Calendar.MONTH) + 1) + context.getResources().getString(R.string.month)
+						+ String.valueOf(
+								calendar.get(Calendar.DAY_OF_MONTH) + context.getResources().getString(R.string.day)
+										+ "   " + weeks[calendar.get(Calendar.DAY_OF_WEEK) - 1]));
 		CalendarUtil calendarUtil = new CalendarUtil();
 		views.setTextViewText(R.id.date_ch,
-				"ũ�� " + calendarUtil.getChineseMonth(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1,
-						calendar.get(Calendar.DAY_OF_MONTH))
+				context.getResources().getString(R.string.lunar) + "   "
+						+ calendarUtil.getChineseMonth(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1,
+								calendar.get(Calendar.DAY_OF_MONTH))
 				+ calendarUtil.getChineseDay(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1,
 						calendar.get(Calendar.DAY_OF_MONTH)));
+		ComponentName thisWidget = new ComponentName(mContext, BigWeatherWidget.class);
+		AppWidgetManager.getInstance(mContext).updateAppWidget(thisWidget, views);
 	}
 
 	/**
@@ -155,81 +163,51 @@ public class BigWeatherWidget extends AppWidgetProvider {
 	 * @param context
 	 * @param views
 	 */
-	private void widgetOnClick(Context context, RemoteViews views) {
+	private void widgetOnClick(Context context) {
+		Log.v("BigWeatherWidget", "widgetOnClick");
 		Intent intent = new Intent(context, MainActivity.class);
 		PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
 		views.setOnClickPendingIntent(R.id.weather_ic_big, pendingIntent);
 		try {
-			Intent intent2 = new Intent(Intent.ACTION_MAIN);
-			intent2.addCategory(Intent.CATEGORY_LAUNCHER);
-			ComponentName cn = new ComponentName(ClockPackageName, doStartApplicationWithPackageName(ClockPackageName));
-			intent2.setComponent(cn);
-			pendingIntent = PendingIntent.getActivity(context, 0, intent2, 0);
+			Intent clockIntent = new Intent(Intent.ACTION_MAIN);
+			clockIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+			ComponentName cn = new ComponentName(ClockPackageName,
+					ApplicationUtils.doStartApplicationWithPackageName(context, ClockPackageName));
+			clockIntent.setComponent(cn);
+			pendingIntent = PendingIntent.getActivity(context, 0, clockIntent, 0);
 			views.setOnClickPendingIntent(R.id.time, pendingIntent);
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
-		Intent intent3 = new Intent().setAction("com.stu.zdy.weather.big");
-		intent3.putExtra("index", 12);
-		pendingIntent = PendingIntent.getBroadcast(mContext, 0, intent3, 0);
+		Intent refreshIntent = new Intent().setAction(MyApplication.PackageNameBig);
+		pendingIntent = PendingIntent.getBroadcast(mContext, 0, refreshIntent, 0);
 		views.setOnClickPendingIntent(R.id.fresh_button, pendingIntent);
-	}
-
-	/**
-	 * ˢ�����ݣ� 1.����ˢ��Ϊһ����һ�Σ�ˢ��ʱ�䣬���Ӵ洢��ȡ������ˢ��ʱ��������ݡ�
-	 * 2.����ˢ��Ϊ�����ť���߼�����£���ˢ��ʱ�䣬�ڴ������ȡ����ˢ�¡�
-	 * 
-	 * @param kind
-	 * @param jsonObject
-	 */
-	private void bildview(int kind, JSONObject jsonObject) {
-		// TODO Auto-generated method stub
-		RemoteViews views = new RemoteViews(mContext.getPackageName(), R.layout.bigwidget);
-		sharedPreferences = mContext.getSharedPreferences("weather_info", Context.MODE_PRIVATE);
-		Editor editor = sharedPreferences.edit();
-		if (kind == 1) {
-
-			Bundle bundle = new JsonDataAnalysisByBaidu(jsonObject.toString()).getBundle();
-			Log.v("���յ���ʲô����", jsonObject.toString());
-			if (bundle.getString("status").equals("ok")) {
-				editor.putString("widget",
-						bundle.getStringArrayList("item1").get(0) + "," + bundle.getStringArrayList("item1").get(6)
-								+ "," + bundle.getStringArrayList("item1").get(3) + ","
-								+ bundle.getStringArrayList("item1").get(2).substring(11, 16) + "����" + ","
-								+ bundle.getStringArrayList("item1").get(7));
-				editor.commit();
-			}
-		}
-		arrayList.clear();
-		String widgetdata = sharedPreferences.getString("widget", "");
-		Log.v("ȡ�����ݣ�", widgetdata);
-		int j = 0;
-		for (int i = 0; i < widgetdata.length(); i++) {
-			if (widgetdata.substring(i, i + 1).equals(",")) {
-				arrayList.add(widgetdata.substring(j, i));
-				j = i + 1;
-			}
-		}
-		arrayList.add(widgetdata.substring(j, widgetdata.length()));
-		views.setTextViewText(R.id.city_big, arrayList.get(0));
-		views.setTextViewText(R.id.temper_big, arrayList.get(1) + "��");
-		views.setTextViewText(R.id.weather_big, arrayList.get(2));
-		views.setTextViewText(R.id.fresh_big, arrayList.get(3));
-		FreshTime(mContext, views);// ˢ��ʱ���Ƕ�Ҫ����
-		widgetOnClick(mContext, views);// �����¼�Ҳ�Ƕ�Ҫ����
-		changeWidgetPicture(views);// ˢ��ͼƬҲ�Ƕ�Ҫ����
 		ComponentName thisWidget = new ComponentName(mContext, BigWeatherWidget.class);
 		AppWidgetManager.getInstance(mContext).updateAppWidget(thisWidget, views);
 	}
 
-	/**
-	 *
-	 * 
-	 * @param views
-	 */
-	private void changeWidgetPicture(RemoteViews views) {
-		switch (Integer.valueOf(arrayList.get(4))) {
+	private void updateWeatherView(JSONObject jsonObject) {
+		Log.v("BigWeatherWidget", "updateWeatherView");
+		Bundle bundle = new JsonDataAnalysisByBaidu(jsonObject.toString()).getBundle();
+		if (!"ok".equals(bundle.getString("status"))) {
+			Toast.makeText(mContext, mContext.getResources().getString(R.string.sever_error), Toast.LENGTH_SHORT)
+					.show();
+			return;
+		}
+		views.setTextViewText(R.id.city_big, bundle.getStringArrayList("item1").get(0));
+		views.setTextViewText(R.id.temper_big,
+				bundle.getStringArrayList("item1").get(6) + mContext.getResources().getString(R.string.degree));
+		views.setTextViewText(R.id.weather_big, bundle.getStringArrayList("item1").get(3));
+		views.setTextViewText(R.id.fresh_big, bundle.getStringArrayList("item1").get(2));
 
+		changeWidgetPicture(bundle.getStringArrayList("item1").get(7));
+		ComponentName thisWidget = new ComponentName(mContext, BigWeatherWidget.class);
+		AppWidgetManager.getInstance(mContext).updateAppWidget(thisWidget, views);
+	}
+
+	private void changeWidgetPicture(String code) {
+		Log.v("BigWeatherWidget", "changeWidgetPicture");
+		switch (Integer.valueOf(code)) {
 		case 100:
 		case 102:
 		case 103:
@@ -271,71 +249,8 @@ public class BigWeatherWidget extends AppWidgetProvider {
 		default:
 			break;
 		}
+		ComponentName thisWidget = new ComponentName(mContext, BigWeatherWidget.class);
+		AppWidgetManager.getInstance(mContext).updateAppWidget(thisWidget, views);
 	}
 
-	/**
-	 * 
-	 * @param packagename
-	 * @return
-	 */
-	private String doStartApplicationWithPackageName(String packagename) {
-
-		PackageInfo packageinfo = null;
-		try {
-			packageinfo = mContext.getPackageManager().getPackageInfo(packagename, 0);
-		} catch (NameNotFoundException e) {
-			e.printStackTrace();
-		}
-		if (packageinfo == null) {
-			return "";
-		}
-		Intent resolveIntent = new Intent(Intent.ACTION_MAIN, null);
-		resolveIntent.addCategory(Intent.CATEGORY_LAUNCHER);
-		resolveIntent.setPackage(packageinfo.packageName);
-
-		List<ResolveInfo> resolveinfoList = mContext.getPackageManager().queryIntentActivities(resolveIntent, 0);
-
-		ResolveInfo resolveinfo = resolveinfoList.iterator().next();
-		if (resolveinfo != null) {
-			String packageName = resolveinfo.activityInfo.packageName;
-			String className = resolveinfo.activityInfo.name;
-			return className;
-		}
-		return "";
-	}
-
-	/**
-	 * 
-	 * @author Zdy
-	 * 
-	 */
-	class GetInfomationFromNetInBigWidget extends AsyncTask<String, String, String> {
-
-		@Override
-		protected String doInBackground(String... params) {
-			// TODO Auto-generated method stub
-			Log.d("widget+doInBackground", "widget+doInBackground");
-
-			String httpUrl = "https://api.heweather.com/x3/weather?cityid=" + DBManager.getIdByCityName(params[0])
-					+ "&key=57efa20515e94db68ae042319463dba4";
-			String jsonResult = NetWorkUtils.request(httpUrl);
-			return jsonResult;
-		}
-
-		@Override
-		protected void onPostExecute(String result) {
-			// TODO Auto-generated method stub
-			Log.d("widget+onPostExecute", "widget+onPostExecute");
-			JSONObject jsonObject = null;
-			try {
-				jsonObject = new JSONObject(result);
-			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			super.onPostExecute(result);
-			bildview(1, jsonObject);
-		}
-
-	}
 }

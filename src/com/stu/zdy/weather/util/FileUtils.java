@@ -16,19 +16,19 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 
 public class FileUtils {
-	public enum DataOperate {
-		SAVE, ADD, // GET,
+	public enum Operate {
+		SAVE, ADD,
 	}
 
-	public static boolean saveCityList(Context context, DataOperate operate, String input) {
+	public static boolean saveCityList(Context context, Operate operate, String input) {
 		SharedPreferences sharedPreferences = context.getSharedPreferences("weather_info", Context.MODE_PRIVATE);
-		if (operate == FileUtils.DataOperate.SAVE) {
+		if (operate == FileUtils.Operate.SAVE) {
 			Editor editor = sharedPreferences.edit();
 			editor.putString("citylist", input);
 			editor.commit();
 			return true;
 		}
-		if (operate == FileUtils.DataOperate.ADD) {
+		if (operate == FileUtils.Operate.ADD) {
 			String output = sharedPreferences.getString("citylist", new JSONObject().toString());
 			JSONObject temp = null;
 			try {

@@ -1,4 +1,4 @@
-package com.stu.zdy.weather.fragment;
+package com.stu.zdy.weather.ui.fragment;
 
 import android.app.Activity;
 import android.app.Fragment;
@@ -23,7 +23,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.stu.zdy.weather.activity.MainActivity;
+import com.stu.zdy.weather.ui.MainActivity;
 import com.stu.zdy.weather.object.FragmentCallBack;
 import com.stu.zdy.weather_sample.R;
 

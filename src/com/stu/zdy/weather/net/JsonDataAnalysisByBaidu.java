@@ -58,7 +58,7 @@ public class JsonDataAnalysisByBaidu {
 		ArrayList<String> item1 = new ArrayList<String>();
 		item1.add(basic.getString("city"));// 城市名
 		item1.add(basic.getString("id"));// 城市id
-		item1.add(basic.getJSONObject("update").getString("loc"));// 更新时间
+		item1.add(basic.getJSONObject("update").getString("loc").substring(11));// 更新时间
 		JSONObject now = jsonObject.getJSONArray("HeWeather data service 3.0").getJSONObject(0).getJSONObject("now");// 实况天气
 		item1.add(now.getJSONObject("cond").getString("txt"));// 当前天气描述
 		item1.add(now.getString("hum"));// 湿度

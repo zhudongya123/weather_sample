@@ -1,7 +1,12 @@
-package com.stu.zdy.weather.fragment;
+package com.stu.zdy.weather.ui.fragment;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+
+import com.stu.zdy.weather.ui.MainActivity;
+import com.stu.zdy.weather.object.FragmentCallBack;
+import com.stu.zdy.weather.util.FileUtils;
+import com.stu.zdy.weather_sample.R;
 
 import android.app.Activity;
 import android.app.Fragment;
@@ -24,11 +29,6 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.stu.zdy.weather.activity.MainActivity;
-import com.stu.zdy.weather.object.FragmentCallBack;
-import com.stu.zdy.weather.util.FileUtils;
-import com.stu.zdy.weather_sample.R;
 
 @SuppressWarnings("deprecation")
 public class ManageCityFragment extends Fragment {
@@ -116,15 +116,6 @@ public class ManageCityFragment extends Fragment {
 				if (event.getAction() == KeyEvent.ACTION_UP
 						&& keyCode == KeyEvent.KEYCODE_BACK) {
 					// 在CityFragment位于界面上时，按下back键自动调用此方法
-					// String string = new String();
-					// for (int i = 0; i < cityStrings.length; i++) {
-					// if (!cityStrings[i].equals("")) {
-					// string = string + "," + cityStrings[i];
-					// }
-					// }
-					// string = string.substring(1, string.length());
-					// Bundle bundle = new Bundle();
-					// bundle.putString("citys", string);
 					FragmentManager fragmentManager = getFragmentManager();
 					FragmentTransaction fragmentTransaction = fragmentManager
 							.beginTransaction();

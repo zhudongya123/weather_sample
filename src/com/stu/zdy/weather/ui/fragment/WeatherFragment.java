@@ -1,4 +1,4 @@
-package com.stu.zdy.weather.fragment;
+package com.stu.zdy.weather.ui.fragment;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -7,7 +7,7 @@ import java.util.Calendar;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.stu.zdy.weather.activity.MainActivity;
+import com.stu.zdy.weather.ui.MainActivity;
 import com.stu.zdy.weather.floatingActionButton.FloatingActionButton;
 import com.stu.zdy.weather.floatingActionButton.ObservableScrollView;
 import com.stu.zdy.weather.floatingActionButton.ScrollDirectionListener;
@@ -28,6 +28,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.text.Spannable;
@@ -121,7 +122,7 @@ public class WeatherFragment extends Fragment {
 			}
 
 		});
-		httpUtils.run(getActivity(), city);
+		httpUtils.run(new Handler(), city);
 	}
 
 	private void checkReceiveData(String result) {
@@ -346,13 +347,13 @@ public class WeatherFragment extends Fragment {
 		Calendar calendar = Calendar.getInstance();
 		currentTemperatureNumber = Integer.valueOf(item1.get(6));
 		currentTemperature.setText(item1.get(6) + "°");
-		todayWeatherDetail.setText(item1.get(0) + "\n" + item1.get(2).substring(11, 16) + "刷新" + "\n" + item1.get(3)
+		todayWeatherDetail.setText(item1.get(0) + "\n" + item1.get(2) + "刷新" + "\n" + item1.get(3)
 				+ "\n" + "湿度:" + item1.get(4) + "°" + "\n" + item1.get(5) + "\n" + "紫外线强度:" + item1.get(8));
-		
+
 		((MainActivity) getActivity()).onChangeAcitonbar(Integer.valueOf(item1.get(6)), getArguments().getInt("index"));
-		if (getArguments().getInt("index")==0) {
+		if (getArguments().getInt("index") == 0) {
 			((MainActivity) getActivity()).setActionbarColor(Integer.valueOf(item1.get(6)));
-			
+
 		}
 		for (int i = 0; i < 10; i++) {
 			temperatureDatas[i] = Integer.valueOf(item2.get(i));

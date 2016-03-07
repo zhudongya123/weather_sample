@@ -1,4 +1,4 @@
-package com.stu.zdy.weather.activity;
+package com.stu.zdy.weather.ui;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -9,11 +9,11 @@ import org.json.JSONObject;
 import com.stu.zdy.weather.Ldrawer.ActionBarDrawerToggle;
 import com.stu.zdy.weather.Ldrawer.DrawerArrowDrawable;
 import com.stu.zdy.weather.db.DBManager;
-import com.stu.zdy.weather.fragment.HelpFragment;
-import com.stu.zdy.weather.fragment.InfoFragment;
-import com.stu.zdy.weather.fragment.ManageCityFragment;
-import com.stu.zdy.weather.fragment.SettingFragment;
-import com.stu.zdy.weather.fragment.WeatherFragment;
+import com.stu.zdy.weather.ui.fragment.HelpFragment;
+import com.stu.zdy.weather.ui.fragment.InfoFragment;
+import com.stu.zdy.weather.ui.fragment.ManageCityFragment;
+import com.stu.zdy.weather.ui.fragment.SettingFragment;
+import com.stu.zdy.weather.ui.fragment.WeatherFragment;
 import com.stu.zdy.weather.object.FragmentCallBack;
 import com.stu.zdy.weather.object.MaterialDialog;
 import com.stu.zdy.weather.object.MyFragmentPagerAdapter;
@@ -23,7 +23,6 @@ import com.stu.zdy.weather.util.NetWorkUtils;
 import com.stu.zdy.weather.util.ScreenUtils;
 import com.stu.zdy.weather_sample.R;
 
-import android.R.integer;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ActivityManager;
@@ -97,7 +96,7 @@ public class MainActivity extends Activity implements FragmentCallBack {
 	private int height, width;
 	private int cityNumber;
 	private String forWidgetString;
-	private ArrayList<String> cityWeatherArrayList = new ArrayList<String>();
+	// private ArrayList<String> cityWeatherArrayList = new ArrayList<String>();
 	private ArrayList<Fragment> fragments;
 	private Hashtable<Integer, Integer> citysCurrentTemper = new Hashtable<Integer, Integer>();
 
@@ -584,7 +583,7 @@ public class MainActivity extends Activity implements FragmentCallBack {
 						if (DBManager.getIdByCityName(mMaterialDialog.getText()).equals("")) {
 							Toast.makeText(mContext.getApplicationContext(), "输入有错误", Toast.LENGTH_SHORT).show();
 						} else {// 输入成功
-							FileUtils.saveCityList(mContext, FileUtils.DataOperate.ADD, mMaterialDialog.getText());
+							FileUtils.saveCityList(mContext, FileUtils.Operate.ADD, mMaterialDialog.getText());
 							viewPager.removeAllViews();
 							initViewPager();
 							mMaterialDialog.dismiss();
@@ -607,13 +606,6 @@ public class MainActivity extends Activity implements FragmentCallBack {
 				// TODO Auto-generated method stub
 				((TextView) toolBar.getChildAt(1))
 						.setText(FileUtils.getCityFromJsonArray(mContext, viewPager.getCurrentItem()));
-				// try {
-				// Log.v("当前标签页的温度",
-				// String.valueOf(cityTemperature[viewPager.getCurrentItem()]));
-				// setActionbarColor(Integer.valueOf(cityTemperature[viewPager.getCurrentItem()]));
-				// } catch (Exception e) {
-				// // TODO: handle exception
-				// }
 				try {
 
 					setActionbarColor(citysCurrentTemper.get(arg0));

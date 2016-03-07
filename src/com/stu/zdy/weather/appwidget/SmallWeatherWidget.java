@@ -16,7 +16,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.RemoteViews;
 
-import com.stu.zdy.weather.activity.MainActivity;
+import com.stu.zdy.weather.ui.MainActivity;
 import com.stu.zdy.weather.db.DBManager;
 import com.stu.zdy.weather.service.WidgetService;
 import com.stu.zdy.weather.util.NetWorkUtils;

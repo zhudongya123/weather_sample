@@ -1,4 +1,4 @@
-package com.stu.zdy.weather.fragment;
+package com.stu.zdy.weather.ui.fragment;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -11,7 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.stu.zdy.weather.activity.MainActivity;
+import com.stu.zdy.weather.ui.MainActivity;
 import com.stu.zdy.weather.object.FragmentCallBack;
 import com.stu.zdy.weather_sample.R;
 
@@ -32,7 +32,7 @@ import com.stu.zdy.weather_sample.R;
 
 		AssetManager mgr = getActivity().getAssets();
 		@SuppressWarnings("unused")
-		Typeface tf = Typeface.createFromAsset(mgr, "fonts/Roboto-Regular.ttf");// 根据路径得到Typeface
+		Typeface tf = Typeface.createFromAsset(mgr, "fonts/Roboto-Regular.ttf");
 		// TextView textView = (TextView) getActivity().findViewById(R.id.help);
 		// textView.setTypeface(tf);
 	}
@@ -56,9 +56,9 @@ import com.stu.zdy.weather_sample.R;
 	}
 
 	@Override
-	public void onAttach(Activity activity) {// 启动Fragment调用
+	public void onAttach(Activity activity) {
 		// TODO Auto-generated method stub
 		super.onAttach(activity);
-		fragmentCallBack = (MainActivity) activity;// 将Activity实例赋给fragmentCallBack
+		fragmentCallBack = (MainActivity) activity;
 	}
 }

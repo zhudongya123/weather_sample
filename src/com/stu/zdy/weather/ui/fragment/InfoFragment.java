@@ -1,4 +1,4 @@
-package com.stu.zdy.weather.fragment;
+package com.stu.zdy.weather.ui.fragment;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -14,7 +14,7 @@ import android.view.ViewGroup;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import com.stu.zdy.weather.activity.MainActivity;
+import com.stu.zdy.weather.ui.MainActivity;
 import com.stu.zdy.weather.object.FragmentCallBack;
 import com.stu.zdy.weather.util.ScreenUtils;
 import com.stu.zdy.weather_sample.R;
@@ -46,26 +46,26 @@ import com.stu.zdy.weather_sample.R;
 				R.id.textview2);
 		TextView textView3 = (TextView) getActivity().findViewById(
 				R.id.textview3);
-		String string = "<p>素描天气图标作者:<a href=\"http://azuresol.deviantart.com\">AzureSol</a>";
+		String string = "<p>:<a href=\"http://azuresol.deviantart.com\">AzureSol</a>";
 		string = string
-				+ "<a href=\"http://creativecommons.org/licenses/by-sa/3.0/\">使用许可</a></p>";
+				+ "<a href=\"http://creativecommons.org/licenses/by-sa/3.0/\">使</a></p>";
 		string = string
-				+ "<p>其他图标:Material Design Icons  <a href=\"https://github.com/google/material-design-icons/releases/tag/1.0.0\">Github</a></p>";
+				+ "<p>图:Material Design Icons  <a href=\"https://github.com/google/material-design-icons/releases/tag/1.0.0\">Github</a></p>";
 		string = string
-				+ "<p>开源控件:MaterialDialog  <a href=\"https://github.com/drakeet\">GitHub</a></p>";
+				+ "<p>源丶:MaterialDialog  <a href=\"https://github.com/drakeet\">GitHub</a></p>";
 		string = string
-				+ "<p>开源控件:Ldrawer  <a href=\"https://github.com/keklikhasan/LDrawer\">GitHub</a></p>";
+				+ "<p>源丶:Ldrawer  <a href=\"https://github.com/keklikhasan/LDrawer\">GitHub</a></p>";
 		string = string
-				+ "<p>开源控件:FloatingActionButton  <a href=\"https://github.com/makovkastar/FloatingActionButton\">GitHub</a></p>";
+				+ "<p>源丶:FloatingActionButton  <a href=\"https://github.com/makovkastar/FloatingActionButton\">GitHub</a></p>";
 		string = string
-				+ "<p>开源控件:materialish-progress-master  <a href=\"https://github.com/pnikosis/materialish-progress\">GitHub</a></p>";
+				+ "<p>源丶:materialish-progress-master  <a href=\"https://github.com/pnikosis/materialish-progress\">GitHub</a></p>";
 		string = string
-				+ "<p>Java第三方库:json-lib  <a href=\"http://json-lib.sourceforge.net\">网站</a></p>";
-		string = string + "<p>天气照片为个人拍摄，LoGo为个人二次创作</p>";
+				+ "<p>Java:json-lib  <a href=\"http://json-lib.sourceforge.net\">站</a></p>";
+		string = string + "<p>片为悖琇oGo为硕未</p>";
 		CharSequence charSequence = Html.fromHtml(string);
 		textView2.setText(charSequence);
 		textView2.setMovementMethod(LinkMovementMethod.getInstance());
-		String string2 = "<p>编码设计:<a href=\"http://weibo.com/u/3123268127\">@先生的后花园</a></p>";
+		String string2 = "<p>:<a href=\"http://weibo.com/u/3123268127\">@暮园</a></p>";
 
 		CharSequence charSequence2 = Html.fromHtml(string2);
 		textView3.setText(charSequence2);
@@ -92,9 +92,9 @@ import com.stu.zdy.weather_sample.R;
 	}
 
 	@Override
-	public void onAttach(Activity activity) {// 启动Fragment调用
+	public void onAttach(Activity activity) {// Fragment
 		// TODO Auto-generated method stub
 		super.onAttach(activity);
-		fragmentCallBack = (MainActivity) activity;// 将Activity实例赋给fragmentCallBack
+		fragmentCallBack = (MainActivity) activity;// Activity实fragmentCallBack
 	}
 }

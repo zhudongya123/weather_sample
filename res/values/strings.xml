@@ -8,10 +8,27 @@
     <string name="drawer_close">drawer_close</string>
 
     <!-- MyApplication -->
-    <string name="loading_app">正在初始化应用...</string>
+    <string name="loading_app">正在初始化应用…</string>
+    <string name="currentcity">北京</string>
 
     <!-- WeatherFragment -->
     <string name="sever_error">数据提供方出现问题</string>
+    <string name="degree">°</string>
+    <!-- SettingFragment -->
+    <string-array name="setting_title">
+        <item>小部件后台刷新频率</item>
+        <item>是否显示生活建议</item>
+        <item>导航栏透明（实验性功能&amp;&amp;重启生效）</item>
+        <item>多彩温度模式（下拉刷新生效）</item>
+        <item>更改桌面小部件点击事件包名</item>
+    </string-array>
+    <string-array name="setting_subtitle">
+        <item>重新设置之后需要重新添加桌面小部件</item>
+        <item>就算打开估计也不会看吧(重启生效)</item>
+        <item>没有虚拟按键就不要打开啦(。・`ω´・)</item>
+        <item>打开后温度数字将会显示更丰富的颜色</item>
+        <item>点击时间跳转样例（仅支持4*2部件），默认为谷歌时钟，当您需要更改为其他应用时选择此项</item>
+    </string-array>
 
     <!-- AppWidgetProvider -->
     <string name="small_provider_name">质感天气（2 x 1）</string>
@@ -26,5 +43,10 @@
         <item>周五</item>
         <item>周六</item>
     </string-array>
+
+    <!-- AppWidget -->
+    <string name="month">月</string>
+    <string name="day">日</string>
+    <string name="lunar">农历</string>
 
 </resources>

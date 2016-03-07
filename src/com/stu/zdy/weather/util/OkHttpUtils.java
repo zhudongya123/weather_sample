@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -26,7 +27,10 @@ public class OkHttpUtils {
 		this.callBack = weatherCallBack;
 	}
 
-	public void run(final Context context, String city) {
+	public void run(final Handler handler, String city) {
+
+		
+
 		if (mOkHttpClient == null) {
 			mOkHttpClient = new OkHttpClient();
 		}
@@ -41,8 +45,12 @@ public class OkHttpUtils {
 			public void onResponse(final Response response) throws IOException {
 				// TODO Auto-generated method stub
 				final String res = response.body().string();
-				((Activity) context).runOnUiThread(new Runnable() {
+				handler.post(new Runnable() {
+					
+					@Override
 					public void run() {
+						// TODO Auto-generated method stub
+
 						Log.v("receiveData", res);
 						callBack.onUpdate(res);
 					}

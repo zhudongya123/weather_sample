@@ -18,8 +18,11 @@ public class MyApplication extends Application {
 	public SharedPreferences sharedPreferences;
 	public Editor editor;
 	public int runTimes;
+	
 	public static final String WEATHER_URL = "http://apis.baidu.com/heweather/weather/free";
 	public static final String APIKEY = "4a3a9afa23e0c5e7bb85b37ed53ed9d3";
+	public static final String PackageNameBig = "com.stu.zdy.weather.big";
+	public static final String PackageNameSmall = "com.stu.zdy.weather.small";
 
 	@Override
 	public void onCreate() {
@@ -38,6 +41,7 @@ public class MyApplication extends Application {
 			editor.putBoolean("lifeAdvice", true);
 			editor.putString("clockPackageName", "com.google.android.deskclock");
 			editor.putInt("runtimes", 2);
+			editor.putString("currentCity", getResources().getString(R.string.currentcity));
 			try {
 				editor.putString("citylist", new JSONObject("{citylist:[" + "]}").toString());
 			} catch (JSONException e) {

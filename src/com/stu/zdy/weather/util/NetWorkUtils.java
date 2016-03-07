@@ -18,14 +18,7 @@ import android.net.NetworkInfo;
 
 public class NetWorkUtils {
 
-	/**
-	 * 发送Get请求获取数据
-	 * 
-	 * 应当放在异步任务中处理
-	 * 
-	 * @param httpUrl
-	 * @return
-	 */
+
 	public static String request(String httpUrl) {
 		BufferedReader reader = null;
 		String result = null;
@@ -51,12 +44,7 @@ public class NetWorkUtils {
 		return result;
 	}
 
-	/**
-	 * 判断当前网络状态，当不存在网络连接时，返回-1
-	 * 
-	 * @param context
-	 * @return
-	 */
+
 	public static int getConnectedType(Context context) {
 		if (context != null) {
 			ConnectivityManager mConnectivityManager = (ConnectivityManager) context
@@ -78,11 +66,6 @@ public class NetWorkUtils {
 		}
 	}
 
-	/**
-	 * 获得当前IP地址
-	 * 
-	 * @return
-	 */
 	public static String GetNetIp() {
 		URL infoUrl = null;
 		InputStream inStream = null;
@@ -100,7 +83,6 @@ public class NetWorkUtils {
 				while ((line = reader.readLine()) != null)
 					strber.append(line + "\n");
 				inStream.close();
-				// 从反馈的结果中提取出IP地址
 				int start = strber.indexOf("[");
 				int end = strber.indexOf("]", start + 1);
 				line = strber.substring(start + 1, end);
