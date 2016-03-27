@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"
-    android:fillViewport="true" >
+    android:background="@color/white_100">
 
-    <com.stu.zdy.weather.object.MyListView
-        android:id="@+id/setting_listview"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="72dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:dividerHeight="0dp" >
-    </com.stu.zdy.weather.object.MyListView>
+        android:layout_height="wrap_content"
+        android:fillViewport="true">
 
-</ScrollView>
+        <com.stu.zdy.weather.view.MyListView
+            android:id="@+id/setting_listView"
+            android:layout_width="match_parent"
+            android:layout_height="72dp"/>
+
+    </ScrollView>
+</LinearLayout>

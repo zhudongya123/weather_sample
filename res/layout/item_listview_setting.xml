@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:descendantFocusability="blocksDescendants"
+    android:minHeight="72dp"
+    android:paddingBottom="8dp"
+    android:paddingTop="8dp">
+
+    <CheckBox
+        android:id="@+id/setting_switch_checkbox"
+        android:layout_width="30dp"
+        android:layout_height="20dp"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="16dp"/>
+
+    <TextView
+        android:id="@+id/setting_switch_describe"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_toLeftOf="@id/setting_switch_checkbox"
+        android:gravity="left"
+        android:text="这是标题"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/setting_switch_detail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/setting_switch_describe"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="4dp"
+        android:layout_toLeftOf="@id/setting_switch_checkbox"
+        android:gravity="left"
+        android:text="这是详细内容"
+        android:textColor="#888888"
+        android:textSize="14sp" />
+
+</RelativeLayout>

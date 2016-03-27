@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AbsoluteLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <FrameLayout
+        android:id="@+id/small_widget_mask"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/widget_background" />
+
+    <RelativeLayout
+        android:id="@+id/small_root"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/widget_background"
+        android:gravity="center">
+
+        <ImageView
+            android:id="@+id/weather_ic"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginRight="10dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/cloudy_pencil" />
+
+        <TextView
+            android:id="@+id/small_city"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/weather_ic"
+            android:gravity="right"
+            android:maxLines="1"
+            android:paddingTop="4dp"
+            android:text="苏州"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/small_temper"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@id/weather_ic"
+            android:layout_alignRight="@id/small_city"
+            android:gravity="right"
+            android:maxLines="1"
+            android:paddingBottom="4dp"
+            android:text="25°"
+            android:textColor="#FFFFFF"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/small_weather"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_toRightOf="@id/small_city"
+            android:maxLines="1"
+            android:paddingTop="4dp"
+            android:text="多云"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/small_fresh"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@id/weather_ic"
+            android:layout_alignLeft="@id/small_weather"
+            android:maxLines="1"
+            android:paddingBottom="4dp"
+            android:text="18:56更新"
+            android:textColor="#FFFFFF"
+            android:textSize="12sp" />
+
+    </RelativeLayout>
+</AbsoluteLayout>

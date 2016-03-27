@@ -1,14 +1,39 @@
 <resources>
 
-    <style name="AppBaseTheme" parent="android:Theme.Light"></style>
+    <style name="AppBaseTheme" parent="Theme.AppCompat.Light.NoActionBar"></style>
 
     <style name="myActionbar" parent="@android:style/Widget.Holo.Light.ActionBar">
         <item name="android:height">55dp</item>
         <item name="android:icon">@android:color/transparent</item>
     </style>
 
-    <style name="AppTheme" parent="AppBaseTheme">
-        <item name="android:actionBarStyle">@style/myActionbar</item>
+    <style name="AppTheme" parent="AppBaseTheme"></style>
+
+
+    <style name="AppTheme_Cold" parnet="@style/AppTheme">AppTheme_Cold
+        <item name="colorPrimary">@color/white_100</item>
+        <item name="colorAccent">@color/actionbar_cold</item>
+        <item name="colorControlActivated">@color/actionbar_cold</item>
+    </style>
+    <style name="AppTheme.Cool" parnet="@style/AppTheme">AppTheme_Cool
+        <item name="colorPrimary">@color/white_100</item>
+        <item name="colorAccent">@color/actionbar_cool</item>
+        <item name="colorControlActivated">@color/actionbar_cool</item>
+    </style>
+    <style name="AppTheme.Comfortable" parnet="@style/AppTheme">AppTheme_Comfortable
+        <item name="colorPrimary">@color/actionbar_comfortable</item>
+        <item name="colorAccent">@color/actionbar_comfortable</item>
+        <item name="colorControlActivated">@color/actionbar_comfortable</item>
+    </style>
+    <style name="AppTheme.Warm" parnet="@style/AppTheme">AppTheme_Warm
+        <item name="colorPrimary">@color/actionbar_warm</item>
+        <item name="colorAccent">@color/actionbar_warm</item>
+        <item name="colorControlActivated">@color/actionbar_warm</item>
+    </style>
+    <style name="AppTheme.Hot" parnet="@style/AppTheme">AppTheme_Hot
+        <item name="colorPrimary">@color/actionbar_hot</item>
+        <item name="colorAccent">@color/actionbar_hot</item>
+        <item name="colorControlActivated">@color/actionbar_hot</item>
     </style>
 
 </resources>

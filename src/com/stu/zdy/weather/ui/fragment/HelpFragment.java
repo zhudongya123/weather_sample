@@ -1,8 +1,7 @@
 package com.stu.zdy.weather.ui.fragment;
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.Fragment;
+import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -11,54 +10,63 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.stu.zdy.weather.interfaces.FragmentCallBack;
 import com.stu.zdy.weather.ui.MainActivity;
-import com.stu.zdy.weather.object.FragmentCallBack;
 import com.stu.zdy.weather_sample.R;
+import com.umeng.analytics.MobclickAgent;
 
-@SuppressLint("InflateParams") public class HelpFragment extends Fragment {
-	private FragmentCallBack fragmentCallBack = null;
+public class HelpFragment extends Fragment {
 
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
-		return inflater.inflate(R.layout.fragment_help, null);
-	}
+    public final static String TAG = "HelpFragment";
+    private FragmentCallBack fragmentCallBack = null;
 
-	@Override
-	public void onActivityCreated(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
-		super.onActivityCreated(savedInstanceState);
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // TODO Auto-generated method stub
+        return inflater.inflate(R.layout.fragment_help, null);
+    }
 
-		AssetManager mgr = getActivity().getAssets();
-		@SuppressWarnings("unused")
-		Typeface tf = Typeface.createFromAsset(mgr, "fonts/Roboto-Regular.ttf");
-		// TextView textView = (TextView) getActivity().findViewById(R.id.help);
-		// textView.setTypeface(tf);
-	}
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        // TODO Auto-generated method stub
+        super.onActivityCreated(savedInstanceState);
 
-	public void onResume() {
-		super.onResume();
-		getView().setFocusableInTouchMode(true);
-		getView().requestFocus();
-		getView().setOnKeyListener(new View.OnKeyListener() {
-			@Override
-			public boolean onKey(View v, int keyCode, KeyEvent event) {
+        AssetManager mgr = getActivity().getAssets();
+        Typeface tf = Typeface.createFromAsset(mgr, "fonts/Roboto-Regular.ttf");
+        // TextView textView = (TextView) getActivity().findViewById(R.id.help);
+        // textView.setTypeface(tf);
+    }
 
-				if (event.getAction() == KeyEvent.ACTION_UP
-						&& keyCode == KeyEvent.KEYCODE_BACK) {
-					fragmentCallBack.callbackHelpFragment(null);
-					return true;
-				}
-				return false;
-			}
-		});
-	}
+    public void onResume() {
+        super.onResume();
+        MobclickAgent.onPageStart(HelpFragment.TAG);
+        getView().setFocusableInTouchMode(true);
+        getView().requestFocus();
+        getView().setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
 
-	@Override
-	public void onAttach(Activity activity) {
-		// TODO Auto-generated method stub
-		super.onAttach(activity);
-		fragmentCallBack = (MainActivity) activity;
-	}
+                if (event.getAction() == KeyEvent.ACTION_UP
+                        && keyCode == KeyEvent.KEYCODE_BACK) {
+                    fragmentCallBack.callbackHelpFragment(null);
+                    return true;
+                }
+                return false;
+            }
+        });
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        // TODO Auto-generated method stub
+        super.onAttach(context);
+        fragmentCallBack = (MainActivity) context;
+    }
+
+    @Override
+    public void onPause() {
+        MobclickAgent.onPageEnd(HelpFragment.TAG);
+        super.onPause();
+    }
 }

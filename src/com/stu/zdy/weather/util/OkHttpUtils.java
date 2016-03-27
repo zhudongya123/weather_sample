@@ -1,22 +1,17 @@
 package com.stu.zdy.weather.util;
 
-import java.io.IOException;
-
-import android.app.Activity;
-import android.content.Context;
 import android.os.Handler;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.squareup.okhttp.Call;
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 import com.stu.zdy.weather.app.MyApplication;
-import com.stu.zdy.weather.db.DBManager;
+import com.stu.zdy.weather.data.DBManager;
 import com.stu.zdy.weather.interfaces.WeatherCallBack;
-import com.stu.zdy.weather_sample.R;
+
+import java.io.IOException;
 
 public class OkHttpUtils {
 
@@ -26,6 +21,7 @@ public class OkHttpUtils {
 	public OkHttpUtils(WeatherCallBack weatherCallBack) {
 		this.callBack = weatherCallBack;
 	}
+
 
 	public void run(final Handler handler, String city) {
 
@@ -50,7 +46,6 @@ public class OkHttpUtils {
 					@Override
 					public void run() {
 						// TODO Auto-generated method stub
-
 						Log.v("receiveData", res);
 						callBack.onUpdate(res);
 					}

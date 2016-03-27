@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">质感天气</string>
+    <string name="app_name">天哪！</string>
     <string name="hello_world">Hello world!</string>
     <string name="app_description">Android drawer icon with material design animation</string>
     <string name="drawer_open">drawer_open</string>
@@ -10,29 +10,69 @@
     <!-- MyApplication -->
     <string name="loading_app">正在初始化应用…</string>
     <string name="currentcity">北京</string>
+    <string-array name="drawer_list1">
+        <item>查看天气</item>
+        <item>城市管理</item>
+    </string-array>
+    <string-array name="drawer_list2">
+        <item>设置</item>
+        <item>关于</item>
+        <item>帮助</item>
+    </string-array>
+    <string name="no_internet">请打开网络后重试</string>
 
     <!-- WeatherFragment -->
     <string name="sever_error">数据提供方出现问题</string>
     <string name="degree">°</string>
+    <string name="refresh">刷新</string>
+    <string name="uv">紫外线强度:</string>
+    <string name="humidity">湿度</string>
+
+    <!-- ManagerCityFragment-->
+    <string name="cant_delete_city">只剩一个城市啦，不能删除(｡・`ω´･)</string>
+
+
     <!-- SettingFragment -->
     <string-array name="setting_title">
         <item>小部件后台刷新频率</item>
         <item>是否显示生活建议</item>
         <item>导航栏透明（实验性功能&amp;&amp;重启生效）</item>
         <item>多彩温度模式（下拉刷新生效）</item>
-        <item>更改桌面小部件点击事件包名</item>
+        <item>更改小部件点击事件包名</item>
+        <item>设置首选城市</item>
+        <item>是否显示小部件遮罩</item>
     </string-array>
     <string-array name="setting_subtitle">
         <item>重新设置之后需要重新添加桌面小部件</item>
         <item>就算打开估计也不会看吧(重启生效)</item>
         <item>没有虚拟按键就不要打开啦(。・`ω´・)</item>
         <item>打开后温度数字将会显示更丰富的颜色</item>
-        <item>点击时间跳转样例（仅支持4*2部件），默认为谷歌时钟，当您需要更改为其他应用时选择此项</item>
+        <item>默认为谷歌时钟，当您需要更改为其他应用时选择此项</item>
+        <item>小部件将优先展示首选城市的信息</item>
+        <item>浅色壁纸下推荐打开遮罩（刷新或重新添加生效）</item>
     </string-array>
+    <string name="widget_refresh">小部件刷新频率</string>
+    <string name="choose_city">选择城市</string>
+    <string name="open">确定</string>
+    <string name="close">取消</string>
+    <string name="input_package_name">输入包名</string>
+    <string-array name="refresh_time">
+        <item>两小时</item>
+        <item>四小时</item>
+        <item>八小时</item>
+        <item>十六小时</item>
+    </string-array>
+    <string name="two_hours">两小时</string>
+    <string name="four_hours">四小时</string>
+    <string name="eight_hours">八小时</string>
+    <string name="sixteen_hours">十六小时</string>
+    <string name="select_city">当前已选择城市:</string>
+    <string name="widget_refresh_time">当前小部件刷新间隔，额……%*好像是……</string>
 
     <!-- AppWidgetProvider -->
     <string name="small_provider_name">质感天气（2 x 1）</string>
     <string name="big_provider_name">质感天气（4 x 2）</string>
+    <string name="huge_provider_name">质感天气（4 x 3）</string>
 
     <string-array name="week">
         <item>周日</item>
@@ -48,5 +88,14 @@
     <string name="month">月</string>
     <string name="day">日</string>
     <string name="lunar">农历</string>
+    <string name="high_temper">高温</string>
+    <string name="low_temper">低温</string>
+    <string name="isLoading">正在联网更新小部件的信息</string>
+    <string name="loading_time">成功更新数据，时间为:</string>
+    <string name="info_source_3">本应用提供三种尺寸的桌面小部件(1*2,2*4,3*4)，在第一次添加之后本应用将启动一个后台服务来实时更新天气，您可以在设置选项内设置后台自动同步频率。\n 因为后台服务的不确定性，当桌面小部件停止更新时，您可以通过点击小部件的刷新按钮来更新，或者移除所有小部件重新添加。</string>
+    <string name="info_source_1">在未连接网络时，将会显示上一次更新时的天气，同时添加城市和管理城市功能将被禁用。并且此时下拉刷新功能将会失效。</string>
+    <string name="info_source_2">未来五天预报中的温度和曲线颜色也会随着温度的变化而变化，变化的依据为红蓝光谱，同时为了让显示更加清楚，屏蔽了黄色区间和青色区间。\n 导航抽屉中的背景图片也会根据温度变化而自动切换。</string>
+    <string name="info_source_0">本软件的顶栏(ActionBar)的颜色会随着当前温度的变化而变化，当未连接网络时，将会显示为白色，颜色参照如下。</string>
+    <string name="info_source__0">1.2版本更新：\n 1:精简安装包大小\n 2:新增小部件支持\n 3:界面更加Material Design\n 4:加入更多自定义配置\n 5:重构代码，修复已知Bug\n很惭愧，就做了一点微小的更新，谢谢大家。</string>
 
 </resources>

@@ -25,5 +25,18 @@
     <color name="ripple">#ff80ab</color>
     <color name="accent">#ff4081</color>
     <color name="accent_pressed">#f50057</color>
+
+    <color name="divider">#dcdcdc</color>
+    <color name="white_100">#FFFFFF</color>
+    <color name="white_96">#F5F5F5</color>
+    <color name="black_54">#545454</color>
+    <color name="actionbar_hot">#DA4437</color>
+    <color name="actionbar_warm">#EE6C00</color>
+    <color name="actionbar_comfortable">#689E38</color>
+    <color name="actionbar_cool">#62AEFE</color>
+    <color name="actionbar_cold">#1C56FE</color>
+
+
+    <color name="bg_grey">#ebebeb</color>
     
 </resources>

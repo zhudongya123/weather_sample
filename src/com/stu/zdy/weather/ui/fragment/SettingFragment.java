@@ -1,372 +1,298 @@
 package com.stu.zdy.weather.ui.fragment;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.TypedValue;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.SimpleAdapter;
-import android.widget.TextView;
+import android.widget.Toast;
 
+import com.stu.zdy.weather.interfaces.FragmentCallBack;
+import com.stu.zdy.weather.mananger.SharePreferenceMananger;
+import com.stu.zdy.weather.open_source.MaterialDialog;
 import com.stu.zdy.weather.ui.MainActivity;
-import com.stu.zdy.weather.object.FragmentCallBack;
-import com.stu.zdy.weather.object.MaterialDialog;
-import com.stu.zdy.weather.object.MyListView;
-import com.stu.zdy.weather.service.WidgetService;
+import com.stu.zdy.weather.util.ApplicationUtils;
+import com.stu.zdy.weather.util.ScreenUtils;
+import com.stu.zdy.weather.view.MyListView;
 import com.stu.zdy.weather_sample.R;
+import com.umeng.analytics.MobclickAgent;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class SettingFragment extends Fragment {
 
-	private int i;
-	private FragmentCallBack fragmentCallBack = null;
-	private SharedPreferences sharedPreferences;
-	private Editor editor;
-	
+    public final static String TAG = "SettingFragment";
+    private FragmentCallBack fragmentCallBack = null;
+    private SharedPreferences sharedPreferences;
+    private LayoutInflater mLayoutInflater;
 
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
-		return inflater.inflate(R.layout.fragment_setting, null);
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        // TODO Auto-generated method stub
+        View view = inflater.inflate(R.layout.fragment_setting, null);
+        view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        return view;
+    }
 
-	}
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        // TODO Auto-generated method stub
+        super.onActivityCreated(savedInstanceState);
+        mLayoutInflater = android.view.LayoutInflater.from(getActivity());
+        sharedPreferences = getActivity().getSharedPreferences("weather_info", Context.MODE_PRIVATE);
+        MyListView listView = (MyListView) getActivity().findViewById(R.id.setting_listView);
+        ArrayList<HashMap<String, Object>> arrayList = new ArrayList<HashMap<String, Object>>();
 
-	@Override
-	public void onActivityCreated(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
-		super.onActivityCreated(savedInstanceState);
-		sharedPreferences = getActivity().getSharedPreferences("weather_info", Context.MODE_PRIVATE);
-		editor = sharedPreferences.edit();
-		MyListView listView = (MyListView) getActivity().findViewById(R.id.setting_listview);
-		ArrayList<HashMap<String, Object>> arrayList = new ArrayList<HashMap<String, Object>>();
+        String[] titles = getResources().getStringArray(R.array.setting_title);
+        String[] subtitles = getResources().getStringArray(R.array.setting_subtitle);
 
-		String[] titles = getResources().getStringArray(R.array.setting_title);
-		String[] subtitles = getResources().getStringArray(R.array.setting_subtitle);
+        for (int i = 0; i < titles.length; i++) {
+            HashMap<String, Object> map = new HashMap<String, Object>();
+            map.put("describe", titles[i]);
+            map.put("info", subtitles[i]);
+            arrayList.add(map);
+        }
 
-		for (int i = 0; i < 5; i++) {
-			HashMap<String, Object> map = new HashMap<String, Object>();
-			map.put("descride", titles[i]);
-			map.put("info", subtitles[i]);
-			arrayList.add(map);
+        SimpleAdapter adapter = new SimpleAdapter(getActivity(), arrayList, R.layout.item_listview_setting,
+                new String[]{"describe", "info"}, new int[]{R.id.setting_switch_describe, R.id.setting_switch_detail}) {
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                View item = super.getView(position, convertView, parent);
+                CheckBox box = (CheckBox) item.findViewById(R.id.setting_switch_checkbox);
+                switch (position) {
+                    case 0:
+                    case 4:
+                    case 5:
+                        box.setVisibility(View.INVISIBLE);
+                        break;
+                    case 1:
+                        box.setChecked(sharedPreferences.getBoolean("lifeAdvice", true));
+                        break;
+                    case 2:
+                        box.setChecked(sharedPreferences.getBoolean("naviBar", false));
+                        break;
+                    case 3:
+                        box.setChecked(sharedPreferences.getBoolean("moreColor", true));
+                        break;
+                    case 6:
+                        box.setChecked(sharedPreferences.getBoolean("widget_mask", true));
+                        break;
+                }
+                return item;
+            }
+        };
+        listView.setAdapter(adapter);
+        listView.setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> arg0, View view, int position, long arg3) {
+                // TODO Auto-generated method stub
+                CheckBox box = (CheckBox) view.findViewById(R.id.setting_switch_checkbox);
+                box.setClickable(false);
+                switch (position) {
+                    case 0:
+                        initMaterialDialog(1);
+                        break;
+                    case 1:
+                        box.setChecked(!box.isChecked());
+                        SharePreferenceMananger.saveSharePreferenceFromBoolean(getActivity(), "weather_info", "lifeAdvice", box.isChecked());
+                        break;
+                    case 2:
+                        box.setChecked(!box.isChecked());
+                        SharePreferenceMananger.saveSharePreferenceFromBoolean(getActivity(), "weather_info", "naviBar", box.isChecked());
+                        break;
+                    case 3:
+                        box.setChecked(!box.isChecked());
+                        SharePreferenceMananger.saveSharePreferenceFromBoolean(getActivity(), "weather_info", "moreColor", box.isChecked());
+                        break;
+                    case 4:
+                        initMaterialDialog(2);
+                        break;
+                    case 5:
+                        initMaterialDialog(3);
+                        break;
+                    case 6:
+                        box.setChecked(!box.isChecked());
+                        SharePreferenceMananger.saveSharePreferenceFromBoolean(getActivity(), "weather_info", "widget_mask", box.isChecked());
+                        break;
+                    default:
+                        break;
+                }
 
-		}
+            }
+        });
 
-		SimpleAdapter adapter = new SimpleAdapter(getActivity(), arrayList, R.layout.setting_listview,
-				new String[] { "descride", "info" }, new int[] { R.id.descride, R.id.detail });
+    }
 
-		listView.setAdapter(adapter);
-		listView.setBackgroundResource(R.drawable.button);
-		listView.setOnItemClickListener(new OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-				// TODO Auto-generated method stub
-				switch (arg2) {
-				case 0:
-					final MaterialDialog dialog = new MaterialDialog(getActivity());
-					LinearLayout layout = new LinearLayout(getActivity());
+    private void initMaterialDialog(int type) {
+        final MaterialDialog dialog = new MaterialDialog(getActivity());
+        View mRadioLayout;
+        RadioGroup group;
+        switch (type) {
+            case 1:
+                mRadioLayout = mLayoutInflater.inflate(R.layout.dialog_radio, null);
+                group = (RadioGroup) mRadioLayout.findViewById(R.id.setting_radio_radioGroup);
+                String[] rbStrings = getResources().getStringArray(R.array.refresh_time);
+                for (int i = 0; i < 4; i++) {
+                    RadioButton rb = new RadioButton(getActivity());
+                    rb.setChecked(false);
+                    RadioGroup.LayoutParams rbParams = new RadioGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, RadioGroup.LayoutParams.WRAP_CONTENT);
+                    rbParams.setMargins(0, ScreenUtils.dip2px(getActivity(), 4), 0, ScreenUtils.dip2px(getActivity(), 4));
+                    rb.setText(rbStrings[i]);
+                    rb.setLayoutParams(rbParams);
+                    group.addView(rb);
+                }
+                int refreshTime = SharePreferenceMananger.getSharePreferenceFromInteger(getActivity(), "weather_info", "refreshTime");
+                switch (refreshTime) {
+                    case 14400000:
+                        ((RadioButton) group.getChildAt(0)).setChecked(true);
+                        break;
+                    case 28800000:
+                        ((RadioButton) group.getChildAt(1)).setChecked(true);
+                        break;
+                    case 57600000:
+                        ((RadioButton) group.getChildAt(2)).setChecked(true);
+                        break;
+                    case 115200000:
+                        ((RadioButton) group.getChildAt(3)).setChecked(true);
+                        break;
+                }
+                group.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(RadioGroup group, int checkedId) {
+                        if (group.getChildAt(0).getId() == checkedId) {
+                            SharePreferenceMananger.saveSharePreferenceFromInteger(getActivity(), "weather_info", "refreshTime", 7200000);
+                        } else if (group.getChildAt(1).getId() == checkedId) {
+                            SharePreferenceMananger.saveSharePreferenceFromInteger(getActivity(), "weather_info", "refreshTime", 14400000);
+                        } else if (group.getChildAt(2).getId() == checkedId) {
+                            SharePreferenceMananger.saveSharePreferenceFromInteger(getActivity(), "weather_info", "refreshTime", 28800000);
+                        } else if (group.getChildAt(3).getId() == checkedId) {
+                            SharePreferenceMananger.saveSharePreferenceFromInteger(getActivity(), "weather_info", "refreshTime", 57600000);
+                        }
+                        if (ApplicationUtils.stopService(getActivity())) {
+                            ApplicationUtils.runService(getActivity());
+                        }
+                        Toast.makeText(getActivity(), getString(R.string.widget_refresh_time)
+                                + SharePreferenceMananger.getSharePreferenceFromInteger(getActivity(), "weather_info", "refreshTime") + "毫秒吧~", Toast.LENGTH_SHORT).show();
+                        dialog.dismiss();
+                    }
+                });
+                dialog.setContentView(mRadioLayout).setTitle(R.string.widget_refresh).setNegativeButton(R.string.close, new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                    }
+                }).show();
+                break;
+            case 2:
+                final EditText editText = new EditText(getActivity());
+                editText.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                editText.setText(sharedPreferences.getString("clockPackageName", "com.google.android.deskclock"));
+                editText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+                dialog.setContentView(editText).setTitle(getString(R.string.input_package_name)).setNegativeButton(R.string.close, new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // TODO Auto-generated method stub
+                        dialog.dismiss();
+                    }
+                }).setPositiveButton(getString(R.string.open), new OnClickListener() {
 
-					layout.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-					layout.setOrientation(LinearLayout.VERTICAL);
-					for (i = 0; i < 4; i++) {
-						final TextView textView = new TextView(getActivity());
-						LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-								LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-						textView.setLayoutParams(layoutParams);
-						textView.setPadding(0, 24, 0, 24);
-						textView.setText((int) (Math.pow(2, i + 1)) + "小时");
-						textView.setId((i + 13));
-						textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-						textView.setGravity(Gravity.CENTER);
-						textView.setBackgroundResource(R.drawable.button);
-						textView.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // TODO Auto-generated method stub
+                        SharePreferenceMananger.saveSharePreferenceFromString(getActivity(), "weather_info", "clockPackageName", editText.getText().toString());
+                        dialog.dismiss();
+                    }
+                }).setMessage("修改之后您可能需要重新添加小部件").show();
+                break;
+            case 3:
+                mRadioLayout = mLayoutInflater.inflate(R.layout.dialog_radio, null);
+                group = (RadioGroup) mRadioLayout.findViewById(R.id.setting_radio_radioGroup);
+                String currentCity = SharePreferenceMananger.getSharePreferenceFromString(getActivity(), "weather_info", "currentCity");
+                JSONArray citys = null;
+                try {
+                    citys = new JSONObject(SharePreferenceMananger.getSharePreferenceFromString(getActivity(), "weather_info", "citylist")).getJSONArray("citylist");
+                    for (int i = 0; i < citys.length(); i++) {
+                        RadioButton rb = new RadioButton(getActivity());
+                        rb.setChecked(false);
+                        RadioGroup.LayoutParams rbParams = new RadioGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, RadioGroup.LayoutParams.WRAP_CONTENT);
+                        rbParams.setMargins(0, ScreenUtils.dip2px(getActivity(), 4), 0, ScreenUtils.dip2px(getActivity(), 4));
+                        rb.setText((String) citys.get(i));
+                        rb.setLayoutParams(rbParams);
+                        if (currentCity.equals((String) citys.get(i))) rb.setChecked(true);
+                        group.addView(rb);
+                    }
+                } catch (JSONException e) {
 
-							@Override
-							public void onClick(View v) {
-								// TODO Auto-generated method stub
-								editor = sharedPreferences.edit();
-								switch (textView.getId()) {
-								case 13:
-									Log.v("设置为两小时", "设置为两小时");
-									editor.putInt("time", 7200000);
-									break;
-								case 14:
-									Log.v("设置为si小时", "设置为si小时");
-									editor.putInt("time", 14400000);
-									break;
-								case 15:
-									Log.v("设置为liu小时", "设置为liu小时");
-									editor.putInt("time", 28800000);
-									break;
-								case 16:
-									Log.v("设置为ba小时", "设置为ba小时");
-									editor.putInt("time", 57600000);
-									break;
-								}
-								editor.commit();
-								Intent intent = new Intent(getActivity(), WidgetService.class);
-								getActivity().stopService(intent);
-								getActivity().startService(intent);
-								dialog.dismiss();
-							}
-						});
-						layout.addView(textView);
-					}
-					dialog.setContentView(layout).setTitle("刷新频率").setNegativeButton("取消", new OnClickListener() {
+                }
+                group.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(RadioGroup group, int checkedId) {
+                        for (int i = 0; i < group.getChildCount(); i++) {
+                            RadioButton rb = (RadioButton) group.getChildAt(i);
+                            if (checkedId == rb.getId()) {
+                                rb.setChecked(true);
+                                SharePreferenceMananger.saveSharePreferenceFromString(getActivity(), "weather_info", "currentCity", rb.getText().toString());
+                                Toast.makeText(getActivity(), getString(R.string.select_city) + rb.getText().toString(), Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                        dialog.dismiss();
+                    }
+                });
+                dialog.setContentView(mRadioLayout).setTitle(R.string.choose_city).setNegativeButton(R.string.close, new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                    }
+                }).show();
 
-						@Override
-						public void onClick(View v) {
-							// TODO Auto-generated method stub
-							dialog.dismiss();
-						}
-					}).show();
-					Log.v("已经存储了", "已经存储了");
-					break;
-				case 1:
-					final MaterialDialog dialog2 = new MaterialDialog(getActivity());
-					LinearLayout layout2 = new LinearLayout(getActivity());
-					layout2.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-					layout2.setOrientation(LinearLayout.VERTICAL);
-					dialog2.setContentView(layout2).setTitle("开关").setNegativeButton("取消", new OnClickListener() {
+        }
+    }
 
-						@Override
-						public void onClick(View v) {
-							// TODO Auto-generated method stub
-							dialog2.dismiss();
-						}
-					}).show();
-					for (i = 0; i < 2; i++) {
-						final TextView textView = new TextView(getActivity());
-						LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-								LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-						textView.setLayoutParams(layoutParams);
-						textView.setPadding(0, 24, 0, 24);
-						if (i == 0) {
-							textView.setText("打开");
-						}
-						if (i == 1) {
-							textView.setText("关闭");
-						}
-						textView.setId(i + 17);
-						textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-						textView.setGravity(Gravity.CENTER);
-						textView.setBackgroundResource(R.drawable.button);
-						textView.setOnClickListener(new OnClickListener() {
+    public void onResume() {
+        super.onResume();
+        MobclickAgent.onPageStart(SettingFragment.TAG);
+        getView().setFocusableInTouchMode(true);
+        getView().requestFocus();
+        getView().setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (event.getAction() == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_BACK) {
+                    fragmentCallBack.callbackSettingFragment(null);
+                    return true;
+                }
+                return false;
+            }
+        });
+    }
 
-							@Override
-							public void onClick(View v) {
-								// TODO Auto-generated method stub
-								editor = sharedPreferences.edit();
-								switch (textView.getId()) {
-								case 17:
-									Log.e("设置为开启", "设置为开启");
-									editor.putInt("advice", 1);
-									editor.commit();
-									break;
-								case 18:
-									Log.e("设置为关闭", "设置为关闭");
-									editor.putInt("advice", 0);
-									editor.commit();
-									break;
-								}
-								dialog2.dismiss();
-							}
-						});
-						layout2.addView(textView);
-					}
-					break;
-				case 2:
-					final MaterialDialog dialog3 = new MaterialDialog(getActivity());
-					LinearLayout layout3 = new LinearLayout(getActivity());
-					layout3.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-					layout3.setOrientation(LinearLayout.VERTICAL);
-					for (i = 0; i < 2; i++) {
-						final TextView textView = new TextView(getActivity());
-						LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-								LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-						textView.setLayoutParams(layoutParams);
-						textView.setPadding(0, 24, 0, 24);
-						if (i == 0) {
-							textView.setText("打开");
-						}
-						if (i == 1) {
-							textView.setText("关闭");
-						}
-						textView.setId(i + 19);
-						textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-						textView.setGravity(Gravity.CENTER);
-						textView.setBackgroundResource(R.drawable.button);
-						textView.setOnClickListener(new OnClickListener() {
+    @Override
+    public void onPause() {
+        super.onPause();
+        MobclickAgent.onPageEnd(SettingFragment.TAG);
+    }
 
-							@Override
-							public void onClick(View v) {
-								// TODO Auto-generated method stub
-								editor = sharedPreferences.edit();
-								switch (textView.getId()) {
-								case 19:
-									Log.e("设置为开启", "设置为开启");
-									editor.putInt("bar", 1);
-									editor.commit();
-									break;
-								case 20:
-									Log.e("设置为关闭", "设置为关闭");
-									editor.putInt("bar", 0);
-									editor.commit();
-									break;
-								}
-								dialog3.dismiss();
-							}
-						});
-						layout3.addView(textView);
-					}
-					dialog3.setContentView(layout3).setTitle("开关").setNegativeButton("取消", new OnClickListener() {
-						@Override
-						public void onClick(View v) {
-							// TODO Auto-generated method stub
-							dialog3.dismiss();
-						}
-					}).show();
-					break;
-				case 3:
-					final MaterialDialog dialog4 = new MaterialDialog(getActivity());
-					LinearLayout layout4 = new LinearLayout(getActivity());
-					layout4.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-					layout4.setOrientation(LinearLayout.VERTICAL);
-					for (i = 0; i < 2; i++) {
-						final TextView textView = new TextView(getActivity());
-						LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-								LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-						textView.setLayoutParams(layoutParams);
-						textView.setPadding(0, 24, 0, 24);
-						if (i == 0) {
-							textView.setText("打开");
-						}
-						if (i == 1) {
-							textView.setText("关闭");
-						}
-						textView.setId(i + 21);
-						textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-						textView.setGravity(Gravity.CENTER);
-						textView.setBackgroundResource(R.drawable.button);
-						textView.setOnClickListener(new OnClickListener() {
-
-							@Override
-							public void onClick(View v) {
-								// TODO Auto-generated method stub
-								editor = sharedPreferences.edit();
-								switch (textView.getId()) {
-								case 21:
-									Log.e("设置为开启", "设置为开启");
-									editor.putInt("morecolor", 1);
-									editor.commit();
-									break;
-								case 22:
-									Log.e("设置为关闭", "设置为关闭");
-									editor.putInt("morecolor", 0);
-									editor.commit();
-									break;
-								}
-								dialog4.dismiss();
-							}
-						});
-
-						layout4.addView(textView);
-					}
-					dialog4.setContentView(layout4).setTitle("开关").setNegativeButton("取消", new OnClickListener() {
-
-						@Override
-						public void onClick(View v) {
-							// TODO Auto-generated method stub
-							dialog4.dismiss();
-						}
-					}).show();
-					break;
-
-				case 4:
-					final MaterialDialog dialog5 = new MaterialDialog(getActivity());
-					LinearLayout layout5 = new LinearLayout(getActivity());
-					layout5.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-					layout5.setOrientation(LinearLayout.VERTICAL);
-					final EditText editText = new EditText(getActivity());
-					editText.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-					editText.setText(sharedPreferences.getString("packagename", "com.google.android.deskclock"));
-					editText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-					TextView textView = new TextView(getActivity());
-					textView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-					textView.setText("修改过后需要移除小部件之后重新添加才能生效。");
-					textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-					layout5.addView(textView);
-					layout5.addView(editText);
-					dialog5.setContentView(layout5).setTitle("输入包名").setNegativeButton("取消", new OnClickListener() {
-
-						@Override
-						public void onClick(View v) {
-							// TODO Auto-generated method stub
-							dialog5.dismiss();
-						}
-					}).setPositiveButton("确定", new OnClickListener() {
-
-						@Override
-						public void onClick(View v) {
-							// TODO Auto-generated method stub
-							editor = sharedPreferences.edit();
-							editor.putString("packagename", editText.getText().toString());
-							editor.commit();
-							dialog5.dismiss();
-						}
-					}).setText("修改之后您可能需要重新添加小部件").show();
-					break;
-				default:
-					break;
-				}
-
-			}
-		});
-		Log.v("刷新时间", String.valueOf(sharedPreferences.getInt("time", 0)));
-		Log.v("开关呢", String.valueOf(sharedPreferences.getInt("advice", 3)));
-		Log.v("导航栏呢", String.valueOf(sharedPreferences.getInt("bar", 3)));
-		Log.v("颜色呢", String.valueOf(sharedPreferences.getInt("morecolor", 3)));
-		Log.v("包名呢", String.valueOf(sharedPreferences.getString("packagename", "com.google.android.deskclock")));
-
-	}
-
-	public void onResume() {
-		super.onResume();
-		getView().setFocusableInTouchMode(true);
-		getView().requestFocus();
-		getView().setOnKeyListener(new View.OnKeyListener() {
-			@Override
-			public boolean onKey(View v, int keyCode, KeyEvent event) {
-
-				if (event.getAction() == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_BACK) {
-					fragmentCallBack.callbackSettingFragment(null);
-					return true;
-				}
-				return false;
-			}
-		});
-	}
-
-	@Override
-	public void onAttach(Activity activity) {// 启动Fragment调用
-		// TODO Auto-generated method stub
-		super.onAttach(activity);
-		fragmentCallBack = (MainActivity) activity;// 将Activity实例赋给fragmentCallBack
-	}
+    @Override
+    public void onAttach(Activity activity) {// 启动Fragment调用
+        // TODO Auto-generated method stub
+        super.onAttach(activity);
+        fragmentCallBack = (MainActivity) activity;// 将Activity实例赋给fragmentCallBack
+    }
 }

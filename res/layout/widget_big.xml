@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AbsoluteLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <FrameLayout
+        android:id="@+id/big_widget_mask"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/widget_background" />
+
+    <RelativeLayout
+        android:id="@+id/big_root"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center">
+
+
+        <TextView
+            android:id="@+id/time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="10dp"
+            android:gravity="center"
+            android:maxLines="1"
+            android:minWidth="120dp"
+            android:text="22:25"
+            android:textColor="#FFFFFF"
+            android:textSize="48sp" />
+
+        <TextView
+            android:id="@+id/date_ch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@id/time"
+            android:layout_alignRight="@id/time"
+            android:layout_below="@id/time"
+            android:gravity="center"
+            android:maxLines="1"
+            android:text="农历   九月初六"
+            android:textColor="#FFFFFF"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@id/time"
+            android:layout_alignRight="@id/time"
+            android:layout_below="@id/date_ch"
+            android:gravity="center"
+            android:maxLines="1"
+            android:text="10月17日   周三"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp" />
+
+        <ImageView
+            android:id="@+id/weather_ic_big"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_alignTop="@id/time"
+            android:layout_marginLeft="28dp"
+            android:layout_marginTop="6dp"
+            android:layout_toRightOf="@id/time"
+            android:scaleType="fitCenter"
+            android:src="@drawable/cloudy_pencil" />
+
+        <TextView
+            android:id="@+id/city_big"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@id/weather_ic_big"
+            android:layout_alignRight="@id/weather_ic_big"
+            android:layout_alignTop="@id/date"
+            android:layout_toRightOf="@id/time"
+            android:gravity="center"
+            android:maxLines="1"
+            android:text="苏州"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/weather_big"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="6dp"
+            android:layout_marginTop="14dp"
+            android:layout_toRightOf="@id/weather_ic_big"
+            android:maxLines="1"
+            android:text="多云"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/temper_big"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@id/weather_big"
+            android:layout_below="@id/weather_big"
+            android:layout_toRightOf="@id/weather_ic_big"
+            android:maxLines="1"
+            android:text="24°"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/fresh_big"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@id/weather_big"
+            android:layout_alignTop="@id/city_big"
+            android:maxLines="1"
+            android:text="18:15更新"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp" />
+
+        <ImageView
+            android:id="@+id/fresh_button"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_alignBottom="@id/city_big"
+            android:layout_toLeftOf="@id/city_big"
+            android:layout_toRightOf="@+id/date_ch"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_refresh_white_24dp" />
+
+    </RelativeLayout>
+</AbsoluteLayout>

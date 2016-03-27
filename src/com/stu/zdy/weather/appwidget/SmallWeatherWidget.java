@@ -1,249 +1,141 @@
 package com.stu.zdy.weather.appwidget;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import android.app.ActivityManager;
-import android.app.ActivityManager.RunningServiceInfo;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
-import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.os.AsyncTask;
+import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
+import android.view.View;
 import android.widget.RemoteViews;
+import android.widget.Toast;
 
+import com.stu.zdy.weather.interfaces.WeatherCallBack;
+import com.stu.zdy.weather.mananger.SharePreferenceMananger;
+import com.stu.zdy.weather.net.JsonDataAnalysisByBaidu;
 import com.stu.zdy.weather.ui.MainActivity;
-import com.stu.zdy.weather.db.DBManager;
-import com.stu.zdy.weather.service.WidgetService;
 import com.stu.zdy.weather.util.NetWorkUtils;
+import com.stu.zdy.weather.util.OkHttpUtils;
+import com.stu.zdy.weather.view.MyBaseAppWidgetProvider;
 import com.stu.zdy.weather_sample.R;
 
-public class SmallWeatherWidget extends AppWidgetProvider {
-	private static final String PackageName = "com.stu.zdy.weather.small";
+import org.json.JSONException;
+import org.json.JSONObject;
 
-	private Context mContext;
-	private String cityName = "";
+public class SmallWeatherWidget extends MyBaseAppWidgetProvider {
+    private static final String PackageName = "com.stu.zdy.weather.small";
 
-	@Override
-	public void onUpdate(final Context context,
-			AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-		mContext = context;
-		runService();
-		SharedPreferences sharedPreferences = context.getSharedPreferences(
-				"weather_info", Context.MODE_PRIVATE);
-		cityName = sharedPreferences.getString("cityName", "����");
-		Log.v("��ǰ����Ϊ", cityName);
-		if (NetWorkUtils.getConnectedType(context) != -1) {
-			GetInfomationFromNetInSmallWidget getInfomationFromNetInSmallWidget = new GetInfomationFromNetInSmallWidget();
-			getInfomationFromNetInSmallWidget.execute(cityName);
-		}
-		Log.v("ִ����update����", "ִ����update����");
-		super.onUpdate(context, appWidgetManager, appWidgetIds);
-	}
+    private Context mContext;
+    private String cityName;
 
-	@Override
-	public void onReceive(Context context, Intent intent) {
-		// TODO Auto-generated method stub
-		mContext = context;
-		runService();
-		Log.d("ִ����receive����", "ִ����receive����");
-		SharedPreferences sharedPreferences = context.getSharedPreferences(
-				"weather_info", Context.MODE_PRIVATE);
-		cityName = sharedPreferences.getString("cityName", "");
-		String action = intent.getAction();
-		Log.d("getaction", action);
-		if (PackageName.equals(action)) {
-			Log.v("�յ�һ���㲥", "�յ�һ���㲥");
-			if (NetWorkUtils.getConnectedType(context) != -1) {
-				GetInfomationFromNetInSmallWidget getInfomationFromNetInSmallWidget = new GetInfomationFromNetInSmallWidget();
-				getInfomationFromNetInSmallWidget.execute(cityName);
-			}
-		}
-		super.onReceive(context, intent);
-	}
 
-	@Override
-	public void onDisabled(Context context) {
-		// TODO Auto-generated method stub
-		super.onDisabled(context);
-		Log.v("onDisabled", "onDisabled");
-	}
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        super.onReceive(context, intent);
+        Log.v("SmallWeatherWidget", "onUpdate");
+        mContext = context;
+        cityName = SharePreferenceMananger.getSharePreferenceFromString(mContext, "weather_info", "currentCity");
+        prepareHttpRequest();
+    }
 
-	@Override
-	public void onEnabled(Context context) {
-		// TODO Auto-generated method stub
-		Log.v("onEnabled", "onEnabled");
-		this.mContext = context;
-		runService();
-		super.onEnabled(context);
-	}
+    private void prepareHttpRequest() {
+        Log.v("SmallWeatherWidget", "prepareHttpRequest");
+        if (NetWorkUtils.getConnectedType(mContext) != -1) {
+            OkHttpUtils okHttpUtils = new OkHttpUtils(new WeatherCallBack() {
 
-	private void runService() {
-		if (!isMyServiceRunning(mContext)) {
-			Log.v("����δ����", "������������");
-			Intent intent = new Intent(mContext, WidgetService.class);
-			mContext.startService(intent);
-		}
-	}
+                @Override
+                public void onUpdate(String result) {
+                    try {
+                        updateWeatherView(new JSONObject(result));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            okHttpUtils.run(new Handler(), cityName);
+        }
+    }
 
-	private boolean isMyServiceRunning(Context context) {
-		ActivityManager manager = (ActivityManager) context
-				.getSystemService(Context.ACTIVITY_SERVICE);
-		for (RunningServiceInfo service : manager
-				.getRunningServices(Integer.MAX_VALUE)) {
-			if ("com.stu.zdy.weather.service.WidgetService"
-					.equals(service.service.getClassName())) {
-				return true;
-			}
-		}
-		return false;
-	}
+    @Override
+    protected void updateWeatherView(JSONObject jsonObject) throws JSONException {
+        Log.v("SmallWeatherWidget", "updateWeatherView");
+        Bundle bundle = new JsonDataAnalysisByBaidu(jsonObject.toString()).getBundle();
+        if (!"ok".equals(bundle.getString("status"))) {
+            Toast.makeText(mContext, mContext.getResources().getString(R.string.sever_error), Toast.LENGTH_SHORT)
+                    .show();
+            return;
+        }
+        RemoteViews views = new RemoteViews(mContext.getPackageName(),
+                R.layout.widget_small);
+        Intent intent = new Intent(mContext, MainActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0,
+                intent, 0);
+        views.setOnClickPendingIntent(R.id.small_root, pendingIntent);
+        try {
+            views.setTextViewText(R.id.small_city, bundle.getStringArrayList("item1").get(0));
+            views.setTextViewText(R.id.small_temper,
+                    bundle.getStringArrayList("item1").get(6) + mContext.getResources().getString(R.string.degree));
+            views.setTextViewText(R.id.small_weather, bundle.getStringArrayList("item1").get(3));
+            views.setTextViewText(R.id.small_fresh, bundle.getStringArrayList("item1").get(2) + mContext.getString(R.string.refresh));
 
-	private void bildview(JSONObject jsonObject) {
-		// TODO Auto-generated method stub
-		RemoteViews views = new RemoteViews(mContext.getPackageName(),
-				R.layout.smallwidget);
-		Intent intent = new Intent(mContext, MainActivity.class);
-		PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0,
-				intent, 0);
-		views.setOnClickPendingIntent(R.id.small_root, pendingIntent);
-		try {
-			views.setTextViewText(
-					R.id.city,
-					jsonObject.getJSONArray("HeWeather data service 3.0")
-							.getJSONObject(0).getJSONObject("basic")
-							.getString("city"));
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		try {
-			views.setTextViewText(
-					R.id.temper,
-					jsonObject.getJSONArray("HeWeather data service 3.0")
-							.getJSONObject(0).getJSONObject("now")
-							.getString("tmp")
-							+ "��");
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		try {
-			views.setTextViewText(R.id.weather,
-					jsonObject.getJSONArray("HeWeather data service 3.0")
-							.getJSONObject(0).getJSONObject("now")
-							.getJSONObject("cond").getString("txt"));
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		try {
-			views.setTextViewText(R.id.fresh,
-					jsonObject.getJSONArray("HeWeather data service 3.0")
-							.getJSONObject(0).getJSONObject("basic")
-							.getJSONObject("update").getString("loc")
-							.substring(11, 16)
-							+ "����");
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		try {
-			switch (Integer.valueOf(jsonObject
-					.getJSONArray("HeWeather data service 3.0")
-					.getJSONObject(0).getJSONObject("now")
-					.getJSONObject("cond").getString("code"))) {
-			case 100:
-			case 102:
-			case 103:
-				views.setImageViewResource(R.id.weather_ic,
-						R.drawable.sunny_pencil);
-				break;
-			case 101:
-				views.setImageViewResource(R.id.weather_ic,
-						R.drawable.cloudy_pencil);
-				break;
-			case 104:
-				views.setImageViewResource(R.id.weather_ic,
-						R.drawable.overcast_pencil);
-				break;
-			case 302:
-			case 303:
-			case 304:
-				views.setImageViewResource(R.id.weather_ic,
-						R.drawable.storm_pencil);
-				break;
-			case 301:
-			case 305:
-			case 306:
-			case 307:
-			case 308:
-			case 309:
-			case 310:
-			case 311:
-			case 312:
-			case 313:
-				views.setImageViewResource(R.id.weather_ic,
-						R.drawable.rain_pencil);
-				break;
-			case 400:
-			case 401:
-			case 402:
-			case 403:
-			case 404:
-			case 405:
-			case 406:
-			case 407:
-				views.setImageViewResource(R.id.weather_ic,
-						R.drawable.snow_pencil);
-				break;
-			}
-		} catch (NumberFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		ComponentName thisWidget = new ComponentName(mContext,
-				SmallWeatherWidget.class);
-		AppWidgetManager.getInstance(mContext).updateAppWidget(thisWidget,
-				views);
-	}
+        } catch (NullPointerException e) {
 
-	class GetInfomationFromNetInSmallWidget extends
-			AsyncTask<String, String, String> {
+        }
+        if (SharePreferenceMananger.getSharePreferenceFromBoolean(mContext, "weather_info", "widget_mask"))
+            views.setViewVisibility(R.id.small_widget_mask, View.VISIBLE);
+        else views.setViewVisibility(R.id.small_widget_mask, View.INVISIBLE);
 
-		@Override
-		protected String doInBackground(String... params) {
-			// TODO Auto-generated method stub
-			Log.d("widget+doInBackground", "widget+doInBackground");
-
-			String httpUrl = "https://api.heweather.com/x3/weather?cityid="
-					+ DBManager.getIdByCityName(params[0])
-					+ "&key=57efa20515e94db68ae042319463dba4";
-			String jsonResult = NetWorkUtils.request(httpUrl);
-			return jsonResult;
-		}
-
-		@Override
-		protected void onPostExecute(String result) {
-			// TODO Auto-generated method stub
-			JSONObject jsonObject = null;
-			try {
-				jsonObject = new JSONObject(result);
-			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			super.onPostExecute(result);
-			bildview(jsonObject);
-		}
-
-	}
-
+        int code = Integer.parseInt(bundle.getStringArrayList("item1").get(7));
+        switch (code) {
+            case 100:
+            case 102:
+            case 103:
+                views.setImageViewResource(R.id.weather_ic,
+                        R.drawable.sunny_pencil);
+                break;
+            case 101:
+                views.setImageViewResource(R.id.weather_ic,
+                        R.drawable.cloudy_pencil);
+                break;
+            case 104:
+                views.setImageViewResource(R.id.weather_ic,
+                        R.drawable.overcast_pencil);
+                break;
+            case 302:
+            case 303:
+            case 304:
+                views.setImageViewResource(R.id.weather_ic,
+                        R.drawable.storm_pencil);
+                break;
+            case 301:
+            case 305:
+            case 306:
+            case 307:
+            case 308:
+            case 309:
+            case 310:
+            case 311:
+            case 312:
+            case 313:
+                views.setImageViewResource(R.id.weather_ic,
+                        R.drawable.rain_pencil);
+                break;
+            case 400:
+            case 401:
+            case 402:
+            case 403:
+            case 404:
+            case 405:
+            case 406:
+            case 407:
+                views.setImageViewResource(R.id.weather_ic,
+                        R.drawable.snow_pencil);
+                break;
+        }
+        ComponentName thisWidget = new ComponentName(mContext, SmallWeatherWidget.class);
+        AppWidgetManager.getInstance(mContext).updateAppWidget(thisWidget, views);
+        super.updateWeatherView(jsonObject);
+    }
 }

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/huge_future_weather_day1"
+    android:layout_width="0dp"
+    android:layout_height="match_parent"
+    android:layout_weight="1">
+
+    <TextView
+        android:id="@+id/huge_future_weather_day1_date"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:maxLines="1"
+        android:textColor="@color/white_100"
+        android:text="3月27日"
+        android:textSize="12sp" />
+
+    <ImageView
+        android:id="@+id/huge_future_weather_day1_icon"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_below="@id/huge_future_weather_day1_date"
+        android:layout_marginTop="4dp"
+        android:padding="4dp"
+        android:src="@drawable/cloudy_pencil" />
+
+    <TextView
+        android:id="@+id/huge_future_weather_day1_weather"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/huge_future_weather_day1_icon"
+        android:layout_marginTop="4dp"
+        android:gravity="center"
+        android:textColor="@color/white_100"
+        android:maxLines="1"
+        android:text="多云"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/huge_future_weather_day1_temper"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/huge_future_weather_day1_weather"
+        android:layout_marginTop="4dp"
+        android:gravity="center"
+        android:textColor="@color/white_100"
+        android:maxLines="1"
+        android:text="13~18度"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/huge_future_weather_day1_low_change"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:textColor="@color/white_100"
+        android:gravity="center"
+        android:maxLines="1"
+        android:text="低温 +3度"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/huge_future_weather_day1_high_change"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/huge_future_weather_day1_low_change"
+        android:gravity="center"
+        android:textColor="@color/white_100"
+        android:maxLines="1"
+        android:text="高温 -5度"
+        android:textSize="12sp" />
+
+</RelativeLayout>

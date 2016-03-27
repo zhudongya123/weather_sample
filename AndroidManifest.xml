@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.stu.zdy.weather_sample"
-    android:versionCode="7"
-    android:versionName="1.1.5" >
+    android:versionCode="8"
+    android:versionName="1.2">
 
     <uses-sdk
         android:minSdkVersion="15"
@@ -13,6 +13,7 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.READ_LOGS" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:name="com.stu.zdy.weather.app.MyApplication"
@@ -20,10 +21,18 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:screenOrientation="portrait"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme.Cool">
+
+        <meta-data
+            android:name="UMENG_APPKEY"
+            android:value="56f14897e0f55a79560010e2"></meta-data>
+        <meta-data
+            android:name="UMENG_CHANNEL"
+            android:value="Dev" />
+
         <activity
             android:name="com.stu.zdy.weather.ui.MainActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -34,9 +43,10 @@
         <receiver
             android:name="com.stu.zdy.weather.appwidget.SmallWeatherWidget"
             android:exported="false"
-            android:label="@string/small_provider_name" >
+            android:label="@string/small_provider_name">
             <intent-filter>
                 <action android:name="com.stu.zdy.weather.small" />
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
 
             <meta-data
@@ -46,7 +56,7 @@
         <receiver
             android:name="com.stu.zdy.weather.appwidget.BigWeatherWidget"
             android:exported="false"
-            android:label="@string/big_provider_name" >
+            android:label="@string/big_provider_name">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
                 <action android:name="com.stu.zdy.weather.big" />
@@ -56,11 +66,31 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/provider_big" />
         </receiver>
+        <receiver
+            android:name="com.stu.zdy.weather.appwidget.HugeWeatherWidget"
+            android:exported="false"
+            android:label="@string/huge_provider_name">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.stu.zdy.weather.huge" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/provider_huge" />
+        </receiver>
 
         <service
             android:name="com.stu.zdy.weather.service.WidgetService"
-            android:exported="false" >
-        </service>
+            android:exported="false" />
+
+
+        <service
+            android:name="com.umeng.update.net.DownloadingService"
+            android:process=":DownloadingService" />
+
+        <activity
+            android:name="com.umeng.update.UpdateDialogActivity"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
     </application>
 
 </manifest>

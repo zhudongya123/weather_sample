@@ -59,11 +59,7 @@ public class NetWorkUtils {
 	}
 
 	public static boolean hasInternetConnection(Context context) {
-		if (getConnectedType(context) == -1) {
-			return false;
-		} else {
-			return true;
-		}
+		return getConnectedType(context) != -1;
 	}
 
 	public static String GetNetIp() {
