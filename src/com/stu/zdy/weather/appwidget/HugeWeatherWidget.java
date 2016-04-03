@@ -56,17 +56,18 @@ public class HugeWeatherWidget extends MyBaseAppWidgetProvider {
         String action = intent.getAction();
         Log.v("action", action);
         initData(mContext);
+        updateTimeView(mContext);
         switch (action) {
             case AppWidgetUtils.UPDATE:
-                opTimerTask(1);
                 widgetOnClick(context);
-                prepareHttpRequest();
-                break;
-            case AppWidgetUtils.PackageNameHuge:
                 prepareHttpRequest();
                 updateTimeView(mContext);
                 break;
+            case AppWidgetUtils.PackageNameHuge:
+                prepareHttpRequest();
+                break;
         }
+        ApplicationUtils.runService(mContext);
     }
 
     private void initData(Context context) {
@@ -107,30 +108,33 @@ public class HugeWeatherWidget extends MyBaseAppWidgetProvider {
     }
 
     @Override
-    protected void opTimerTask(int type) {
+    protected void opTimerTask() {
         Log.v("HugeWeatherWidget", "opTimerTask");
-        if (type == 1) {
-            timer = new Timer();
-            task = new TimerTask() {
-
-                @Override
-                public void run() {
-                    // TODO Auto-generated method stub
-                    updateTimeView(mContext);
-                }
-            };
-            task.run();
-            timer.schedule(task, Calendar.getInstance().getTime(), 60000);
-
-        } else {
+        if (timer != null) {
             timer.cancel();
-            task.cancel();
             timer = null;
+        }
+        if (task != null) {
+            task.cancel();
             task = null;
         }
+        timer = new Timer();
+        task = new TimerTask() {
+
+            @Override
+            public void run() {
+                // TODO Auto-generated method stub
+                updateTimeView(mContext);
+            }
+        };
+        task.run();
+        Calendar nextMinute = Calendar.getInstance();
+        nextMinute.set(Calendar.MINUTE, Calendar.getInstance().get(Calendar.MINUTE) + 1);
+        nextMinute.set(Calendar.SECOND, 0);
+        timer.schedule(task, nextMinute.getTime(), 60000);
+        updateTimeView(mContext);
     }
 
-    @Override
     protected void updateWeatherView(JSONObject jsonObject) throws JSONException {
         Bundle bundle = new JsonDataAnalysisByBaidu(jsonObject.toString()).getBundle();
         if (!"ok".equals(bundle.getString("status"))) {
@@ -152,7 +156,7 @@ public class HugeWeatherWidget extends MyBaseAppWidgetProvider {
         }
         for (int i = 0; i < 3; i++) {
             ArrayList<String> array = bundle.getStringArrayList("item2");
-            rootView.setTextViewText(ids[i][2], array.get(15 + i * 2) + (array.get(17 + i * 2).equals(array.get(17 + i * 2 + 1)) ? "" : "转" + array.get(17 + i * 2 + 1)));
+            rootView.setTextViewText(ids[i][2], array.get(15 + i * 2) + (array.get(17 + i * 2).equals(array.get(17 + i * 2 + 1)) ? "" : "~" + array.get(17 + i * 2 + 1)));
 
             rootView.setTextViewText(ids[i][3], array.get(i + 1) + mContext.getString(R.string.degree) +
                     "~" + array.get(i + 6) + mContext.getString(R.string.degree));
@@ -162,7 +166,6 @@ public class HugeWeatherWidget extends MyBaseAppWidgetProvider {
         }
         ComponentName thisWidget = new ComponentName(mContext, HugeWeatherWidget.class);
         AppWidgetManager.getInstance(mContext).updateAppWidget(thisWidget, rootView);
-        super.updateWeatherView(jsonObject);
     }
 
 
@@ -179,7 +182,7 @@ public class HugeWeatherWidget extends MyBaseAppWidgetProvider {
                 String.valueOf(calendar.get(Calendar.MONTH) + 1) + mContext.getResources().getString(R.string.month)
                         + String.valueOf(
                         calendar.get(Calendar.DAY_OF_MONTH) + mContext.getResources().getString(R.string.day)
-                                + "   " + weeks[calendar.get(Calendar.DAY_OF_WEEK) - 1]));
+                                + " " + weeks[calendar.get(Calendar.DAY_OF_WEEK) - 1]));
         for (int i = 0; i < 3; i++) {
             if (CalendarUtil.monthDays[calendar.get(Calendar.MONTH)] < calendar.get(Calendar.DAY_OF_MONTH) + i + 1) {
                 rootView.setTextViewText(ids[i][0], (calendar.get(Calendar.MONTH) + 2) + mContext.getString(R.string.month) +
@@ -234,7 +237,6 @@ public class HugeWeatherWidget extends MyBaseAppWidgetProvider {
 
 
     private void changeWidgetPicture(String code, int id) {
-        Log.v("hugeWeatherWidget", "changeWidgetPicture");
         RemoteViews views = new RemoteViews(mContext.getPackageName(), R.layout.widget_huge);
         switch (Integer.valueOf(code)) {
             case 100:

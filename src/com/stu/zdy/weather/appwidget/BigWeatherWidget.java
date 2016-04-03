@@ -52,27 +52,35 @@ public class BigWeatherWidget extends MyBaseAppWidgetProvider {
     }
 
     @Override
-    protected void opTimerTask(int type) {
+    protected void opTimerTask() {
         Log.v("BigWeatherWidget", "opTimerTask");
-        if (type == 1) {
-            timer = new Timer();
-            task = new TimerTask() {
-
-                @Override
-                public void run() {
-                    // TODO Auto-generated method stub
-                    updateTimeView(mContext);
-                }
-            };
-            task.run();
-            timer.schedule(task, Calendar.getInstance().getTime(), 60000);
-
-        } else {
-            timer.cancel();
-            task.cancel();
-            timer = null;
-            task = null;
+        try {
+            if (timer != null) {
+                timer.cancel();
+                timer = null;
+            }
+            if (task != null) {
+                task.cancel();
+                task = null;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } catch (Error e) {
+            e.printStackTrace();
         }
+        timer = new Timer();
+        task = new TimerTask() {
+            @Override
+            public void run() {
+                // TODO Auto-generated method stub
+                updateTimeView(mContext);
+            }
+        };
+        task.run();
+        Calendar nextMinute = Calendar.getInstance();
+        nextMinute.set(Calendar.MINUTE, Calendar.getInstance().get(Calendar.MINUTE) + 1);
+        nextMinute.set(Calendar.SECOND, 0);
+        timer.schedule(task, nextMinute.getTime(), 60000);
     }
 
     /**
@@ -89,38 +97,19 @@ public class BigWeatherWidget extends MyBaseAppWidgetProvider {
         String action = intent.getAction();
         Log.d("action", intent.getAction());
         initData(context);
+        updateTimeView(mContext);
         switch (action) {
-            case AppWidgetUtils.ENABLED:
-                ApplicationUtils.runService(mContext);
-                break;
             case AppWidgetUtils.UPDATE:
-                initData(context);
-                opTimerTask(1);
                 widgetOnClick(context);
-                if (!ApplicationUtils.runService(mContext))
-                    prepareHttpRequest();
+                prepareHttpRequest();
                 break;
             case AppWidgetUtils.PackageNameBig:
-                initData(context);
                 prepareHttpRequest();
-                updateTimeView(mContext);
                 break;
         }
+        ApplicationUtils.runService(mContext);
     }
 
-
-    /**
-     * wiget删除时执行
-     *
-     * @param context
-     * @param appWidgetIds
-     */
-    @Override
-    public void onDeleted(Context context, int[] appWidgetIds) {
-        Log.v("BigWeatherWidget", "onDeleted");
-        opTimerTask(0);
-        super.onDeleted(context, appWidgetIds);
-    }
 
     private void prepareHttpRequest() {
         Log.v("BigWeatherWidget", "prepareHttpRequest");
@@ -160,7 +149,7 @@ public class BigWeatherWidget extends MyBaseAppWidgetProvider {
                         calendar.get(Calendar.DAY_OF_MONTH) + context.getResources().getString(R.string.day)
                                 + "   " + weeks[calendar.get(Calendar.DAY_OF_WEEK) - 1]));
         CalendarUtil calendarUtil = new CalendarUtil();
-        views.setTextViewText(R.id.huge_ch,
+        views.setTextViewText(R.id.date_ch,
                 context.getResources().getString(R.string.lunar) + "   "
                         + calendarUtil.getChineseMonth(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1,
                         calendar.get(Calendar.DAY_OF_MONTH))

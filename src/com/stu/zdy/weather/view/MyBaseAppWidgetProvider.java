@@ -3,6 +3,7 @@ package com.stu.zdy.weather.view;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.stu.zdy.weather_sample.R;
@@ -18,7 +19,7 @@ import java.util.Calendar;
 public class MyBaseAppWidgetProvider extends AppWidgetProvider {
     protected Context mContext;
 
-    protected void opTimerTask(int type) {
+    protected void opTimerTask() {
 
     }
 

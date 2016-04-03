@@ -4,7 +4,7 @@
     <color name="card_shadow">#10000000</color>
     <color name="lite_blue">#ff359ff2</color>
     <color name="window_background">#00000000</color>
-        <color name="light_gray">#c2c7cc</color>
+    <color name="light_gray">#c2c7cc</color>
     <color name="dark_gray">#3d454c</color>
     <color name="dark_gray_pressed">#373e44</color>
     <color name="darker_gray">#1f2226</color>
@@ -38,5 +38,5 @@
 
 
     <color name="bg_grey">#ebebeb</color>
-    
+
 </resources>

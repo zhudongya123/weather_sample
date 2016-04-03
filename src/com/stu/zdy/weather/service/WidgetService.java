@@ -4,6 +4,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.stu.zdy.weather.mananger.SharePreferenceMananger;
@@ -16,13 +17,17 @@ import java.util.TimerTask;
 public class WidgetService extends Service {
     private Context mContext;
     private int time = 14400000;
-    private Timer timer = null;
-    private TimerTask timerTask = null;
+    private Timer weatherTimer = null;
+    private TimerTask weatherTimerTask = null;
 
-    private void sendBroadCastTimer(int type) {
+    private Timer refreshTimer = null;
+    private TimerTask refreshTimerTask = null;
+
+
+    private void sendBroadCastForWeather(int type) {
         if (type == 1) {
-            timer = new Timer();
-            timerTask = new TimerTask() {
+            weatherTimer = new Timer();
+            weatherTimerTask = new TimerTask() {
 
                 @Override
                 public void run() {
@@ -32,12 +37,45 @@ public class WidgetService extends Service {
                     mContext.sendBroadcast(new Intent(AppWidgetUtils.PackageNameHuge));
                 }
             };
-            timer.schedule(timerTask, Calendar.getInstance().getTime(), time);
+            weatherTimer.schedule(weatherTimerTask, Calendar.getInstance().getTime(), time);
         } else {
-            timer.cancel();
-            timerTask.cancel();
-            timer = null;
-            timerTask = null;
+            try {
+                weatherTimer.cancel();
+                weatherTimerTask.cancel();
+                weatherTimer = null;
+                weatherTimerTask = null;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
+
+    private void sendBroadCastForRefresh(int type) {
+        if (type == 1) {
+            refreshTimer = new Timer();
+            refreshTimerTask = new TimerTask() {
+
+                @Override
+                public void run() {
+                    mContext.sendBroadcast(new Intent(AppWidgetUtils.REFRESH));
+                }
+            };
+            Calendar nextMinute = Calendar.getInstance();
+            nextMinute.set(Calendar.MINUTE, Calendar.getInstance().get(Calendar.MINUTE) + 1);
+            nextMinute.set(Calendar.SECOND, 0);
+            refreshTimer.schedule(refreshTimerTask, nextMinute.getTime(), 60000);
+            mContext.sendBroadcast(new Intent(AppWidgetUtils.REFRESH));
+        } else {
+            try {
+                refreshTimer.cancel();
+                refreshTimerTask.cancel();
+                refreshTimer = null;
+                refreshTimerTask = null;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
     }
@@ -48,20 +86,23 @@ public class WidgetService extends Service {
         Log.v("onStartCommand", "onStartCommand");
         mContext = getApplicationContext();
         time = SharePreferenceMananger.getSharePreferenceFromInteger(this, "weather_info", "refreshTime");
-        sendBroadCastTimer(1);
+        sendBroadCastForWeather(1);
+        sendBroadCastForRefresh(1);
         return super.onStartCommand(intent, flags, startId);
     }
+
 
     @Override
     public void onDestroy() {
         // TODO Auto-generated method stub
         super.onDestroy();
-        sendBroadCastTimer(0);
+        sendBroadCastForWeather(0);
+        sendBroadCastForRefresh(0);
     }
 
+    @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        // TODO Auto-generated method stub
         return null;
     }
 

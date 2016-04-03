@@ -544,17 +544,22 @@ public class MainActivity extends ActionBarActivity implements FragmentCallBack 
             @Override
             public void onDrawerOpened(View arg0) {
                 // TODO Auto-generated method stub
-                changeWeatherPicture(citysCurrentWeatherCode.get(viewPager.getCurrentItem()),
-                        drawerWeatherPictureImageView);
-                drawerTextView.setText(getCityFromJsonArray(mContext,
-                        viewPager.getCurrentItem()) + "\n" + citysCurrentTemper.get(viewPager.getCurrentItem()) + getString(R.string.degree));
-                if (citysCurrentTemper.get(viewPager.getCurrentItem()) > 28) {
-                    drawerBackGround.setImageResource(R.drawable.high_temper);
-                } else if (citysCurrentTemper.get(viewPager.getCurrentItem()) < 14) {
-                    drawerBackGround.setImageResource(R.drawable.low_temper);
-                } else {
-                    drawerBackGround.setImageResource(R.drawable.middle_temper);
+                try {
+                    changeWeatherPicture(citysCurrentWeatherCode.get(viewPager.getCurrentItem()),
+                            drawerWeatherPictureImageView);
+                    drawerTextView.setText(getCityFromJsonArray(mContext,
+                            viewPager.getCurrentItem()) + "\n" + citysCurrentTemper.get(viewPager.getCurrentItem()) + getString(R.string.degree));
+                    if (citysCurrentTemper.get(viewPager.getCurrentItem()) > 28) {
+                        drawerBackGround.setImageResource(R.drawable.high_temper);
+                    } else if (citysCurrentTemper.get(viewPager.getCurrentItem()) < 14) {
+                        drawerBackGround.setImageResource(R.drawable.low_temper);
+                    } else {
+                        drawerBackGround.setImageResource(R.drawable.middle_temper);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
+
             }
 
             @Override

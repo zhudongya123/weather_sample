@@ -1,7 +1,7 @@
 package com.stu.zdy.weather.ui.fragment;
 
+import android.app.Activity;
 import android.app.Fragment;
-import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -58,7 +58,7 @@ public class HelpFragment extends Fragment {
     }
 
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(Activity context) {
         // TODO Auto-generated method stub
         super.onAttach(context);
         fragmentCallBack = (MainActivity) context;

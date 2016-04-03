@@ -70,9 +70,7 @@ public class ManageCityFragment extends Fragment {
         }
         int index = 0;
         for (int i = 0; i < cityList.length(); i++) {
-            RelativeLayout layout = new RelativeLayout(getActivity());
-
-            layout.setLayoutParams(new LayoutParams(width / 3, height / 4));
+            RelativeLayout layout = new RelativeLayout(getActivity());  layout.setLayoutParams(new LayoutParams(width / 3, height / 4));
             layout.setBackgroundColor(getResources().getColor(R.color.white_96));
             ImageView deleteButton = new ImageView(getActivity());
             RelativeLayout.LayoutParams deleteButtonLayoutParams = new RelativeLayout.LayoutParams(
@@ -81,6 +79,7 @@ public class ManageCityFragment extends Fragment {
                     .addRule(RelativeLayout.ALIGN_PARENT_TOP, 1);
             deleteButtonLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT,
                     1);
+
             deleteButton.setLayoutParams(deleteButtonLayoutParams);
             deleteButton.setImageResource(R.drawable.ic_cancel_grey600_24dp);
             deleteButton.setScaleType(ScaleType.CENTER_CROP);

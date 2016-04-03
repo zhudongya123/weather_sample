@@ -16,6 +16,7 @@ import com.stu.zdy.weather.interfaces.WeatherCallBack;
 import com.stu.zdy.weather.mananger.SharePreferenceMananger;
 import com.stu.zdy.weather.net.JsonDataAnalysisByBaidu;
 import com.stu.zdy.weather.ui.MainActivity;
+import com.stu.zdy.weather.util.ApplicationUtils;
 import com.stu.zdy.weather.util.NetWorkUtils;
 import com.stu.zdy.weather.util.OkHttpUtils;
 import com.stu.zdy.weather.view.MyBaseAppWidgetProvider;
@@ -38,6 +39,7 @@ public class SmallWeatherWidget extends MyBaseAppWidgetProvider {
         mContext = context;
         cityName = SharePreferenceMananger.getSharePreferenceFromString(mContext, "weather_info", "currentCity");
         prepareHttpRequest();
+        ApplicationUtils.runService(mContext);
     }
 
     private void prepareHttpRequest() {

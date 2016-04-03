@@ -161,16 +161,16 @@ public class SettingFragment extends Fragment {
                 }
                 int refreshTime = SharePreferenceMananger.getSharePreferenceFromInteger(getActivity(), "weather_info", "refreshTime");
                 switch (refreshTime) {
-                    case 14400000:
+                    case 7200000:
                         ((RadioButton) group.getChildAt(0)).setChecked(true);
                         break;
-                    case 28800000:
+                    case 14400000:
                         ((RadioButton) group.getChildAt(1)).setChecked(true);
                         break;
-                    case 57600000:
+                    case 28800000:
                         ((RadioButton) group.getChildAt(2)).setChecked(true);
                         break;
-                    case 115200000:
+                    case 57600000:
                         ((RadioButton) group.getChildAt(3)).setChecked(true);
                         break;
                 }
