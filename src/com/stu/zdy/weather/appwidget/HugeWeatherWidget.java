@@ -66,8 +66,10 @@ public class HugeWeatherWidget extends MyBaseAppWidgetProvider {
             case AppWidgetUtils.PackageNameHuge:
                 prepareHttpRequest();
                 break;
+            case AppWidgetUtils.WAKE:
+                widgetOnClick(context);
+                ApplicationUtils.runService(mContext);
         }
-        ApplicationUtils.runService(mContext);
     }
 
     private void initData(Context context) {

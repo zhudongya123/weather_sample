@@ -183,7 +183,7 @@ public class WeatherFragment extends Fragment {
         todayWeatherDetail.setGravity(Gravity.RIGHT);
         todayWeatherDetail.setLayoutParams(cityParams);
         todayWeatherDetail.setTextColor(getResources().getColor(android.R.color.white));
-        todayWeatherDetail.setTextSize(TypedValue.COMPLEX_UNIT_PX, cardWidth / 40);
+        todayWeatherDetail.setTextSize(TypedValue.COMPLEX_UNIT_PX, cardWidth / 30);
         HorizontalScrollView horizontalScrollView = new HorizontalScrollView(getActivity());
         RelativeLayout.LayoutParams horizontalLayoutParams = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
                 LayoutParams.WRAP_CONTENT);
