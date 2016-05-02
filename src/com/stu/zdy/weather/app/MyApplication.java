@@ -20,7 +20,7 @@ public class MyApplication extends Application {
     public Editor editor;
     public int runTimes;
 
-    public static final String WEATHER_URL = "http://apis.baidu.com/heweather/weather/free";
+    public static final String WEATHER_URL = "http://apis.baidu.com/heweather/weather/";
     public static final String APIKEY = "4a3a9afa23e0c5e7bb85b37ed53ed9d3";
 
     @Override

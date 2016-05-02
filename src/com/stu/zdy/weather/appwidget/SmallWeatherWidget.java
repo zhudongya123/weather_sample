@@ -18,7 +18,7 @@ import com.stu.zdy.weather.net.JsonDataAnalysisByBaidu;
 import com.stu.zdy.weather.ui.MainActivity;
 import com.stu.zdy.weather.util.ApplicationUtils;
 import com.stu.zdy.weather.util.NetWorkUtils;
-import com.stu.zdy.weather.util.OkHttpUtils;
+import com.stu.zdy.weather.retrofit.OkHttpUtils;
 import com.stu.zdy.weather.view.MyBaseAppWidgetProvider;
 import com.stu.zdy.weather_sample.R;
 

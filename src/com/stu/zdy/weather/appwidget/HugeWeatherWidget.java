@@ -20,7 +20,7 @@ import com.stu.zdy.weather.util.AppWidgetUtils;
 import com.stu.zdy.weather.util.ApplicationUtils;
 import com.stu.zdy.weather.util.CalendarUtil;
 import com.stu.zdy.weather.util.NetWorkUtils;
-import com.stu.zdy.weather.util.OkHttpUtils;
+import com.stu.zdy.weather.retrofit.OkHttpUtils;
 import com.stu.zdy.weather.view.MyBaseAppWidgetProvider;
 import com.stu.zdy.weather_sample.R;
 
@@ -68,8 +68,8 @@ public class HugeWeatherWidget extends MyBaseAppWidgetProvider {
                 break;
             case AppWidgetUtils.WAKE:
                 widgetOnClick(context);
-                ApplicationUtils.runService(mContext);
         }
+        ApplicationUtils.runService(mContext);
     }
 
     private void initData(Context context) {

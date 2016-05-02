@@ -7,7 +7,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.text.Spannable;
@@ -38,11 +37,11 @@ import com.stu.zdy.weather.net.JsonDataAnalysisByBaidu;
 import com.stu.zdy.weather.open_source.floatingActionButton.FloatingActionButton;
 import com.stu.zdy.weather.open_source.floatingActionButton.ObservableScrollView;
 import com.stu.zdy.weather.open_source.floatingActionButton.ScrollDirectionListener;
+import com.stu.zdy.weather.retrofit.OkHttpUtils;
 import com.stu.zdy.weather.ui.MainActivity;
 import com.stu.zdy.weather.util.FileUtils;
 import com.stu.zdy.weather.util.ImageUtils;
 import com.stu.zdy.weather.util.NetWorkUtils;
-import com.stu.zdy.weather.util.OkHttpUtils;
 import com.stu.zdy.weather.util.ScreenUtils;
 import com.stu.zdy.weather_sample.R;
 
@@ -70,7 +69,6 @@ public class WeatherFragment extends Fragment {
     private int currentTemperatureNumber = 30;
     int[] temperatureDatas = {30, 30, 30, 30, 30, 23, 23, 23, 23, 23};
     private int drawableWidth;
-    private Handler handler;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -78,7 +76,6 @@ public class WeatherFragment extends Fragment {
 
         height = ScreenUtils.getScreenHeight(getActivity());
         width = (int) (ScreenUtils.getScreenWidth(getActivity()) * 0.9528);
-        handler = new Handler();
         initUI();
         if (-1 != NetWorkUtils.getConnectedType(getActivity())) {
             prepareHttpRequest(getArguments().getString("city"));
@@ -109,16 +106,12 @@ public class WeatherFragment extends Fragment {
     }
 
     private void prepareHttpRequest(String city) {
-        OkHttpUtils httpUtils = new OkHttpUtils(new WeatherCallBack() {
-
+        OkHttpUtils.runRxjava(city, new WeatherCallBack() {
             @Override
             public void onUpdate(String result) {
-                // TODO Auto-generated method stub
                 checkReceiveData(result);
             }
-
         });
-        httpUtils.run(handler, city);
     }
 
     private void checkReceiveData(String result) {
