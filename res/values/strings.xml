@@ -90,6 +90,7 @@
     <string name="lunar">农历</string>
     <string name="high_temper">高温</string>
     <string name="low_temper">低温</string>
+    <string name="no_data">暂无数据</string>
     <string name="isLoading">正在联网更新小部件的信息</string>
     <string name="loading_time">成功更新数据，时间为:</string>
     <string name="info_source_3">本应用提供三种尺寸的桌面小部件(1*2,2*4,3*4)，在第一次添加之后本应用将启动一个后台服务来实时更新天气，您可以在设置选项内设置后台自动同步频率。\n 因为后台服务的不确定性，当桌面小部件停止更新时，您可以通过点击小部件的刷新按钮来更新，或者移除所有小部件重新添加。</string>

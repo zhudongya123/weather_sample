@@ -42,11 +42,11 @@
 
         <receiver
             android:name="com.stu.zdy.weather.appwidget.SmallWeatherWidget"
-            android:exported="false"
+            android:exported="true"
             android:label="@string/small_provider_name">
             <intent-filter>
-                <action android:name="com.stu.zdy.weather.small" />
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="android.intent.action.USER_PRESENT" />
+                <action android:name="com.stu.zdy.weather.refresh.weather" />
             </intent-filter>
 
             <meta-data
@@ -55,13 +55,13 @@
         </receiver>
         <receiver
             android:name="com.stu.zdy.weather.appwidget.BigWeatherWidget"
-            android:exported="false"
+            android:exported="true"
             android:label="@string/big_provider_name">
             <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="com.stu.zdy.weather.big" />
                 <action android:name="android.intent.action.USER_PRESENT" />
-                <action android:name="com.stu.zdy.weather.refresh" />
+                <action android:name="com.stu.zdy.weather.refresh.weather" />
+                <action android:name="com.stu.zdy.weather.refresh.time" />
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
 
             <meta-data
@@ -70,13 +70,13 @@
         </receiver>
         <receiver
             android:name="com.stu.zdy.weather.appwidget.HugeWeatherWidget"
-            android:exported="false"
+            android:exported="true"
             android:label="@string/huge_provider_name">
             <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="com.stu.zdy.weather.huge" />
                 <action android:name="android.intent.action.USER_PRESENT" />
-                <action android:name="com.stu.zdy.weather.refresh" />
+                <action android:name="com.stu.zdy.weather.refresh.weather" />
+                <action android:name="com.stu.zdy.weather.refresh.time" />
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
@@ -85,15 +85,12 @@
 
         <service
             android:name="com.stu.zdy.weather.service.WidgetService"
-            android:exported="false" />
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.stu.zdy.weather.refresh.notify" />
+            </intent-filter>
+        </service>
 
-        <service
-            android:name="com.umeng.update.net.DownloadingService"
-            android:process=":DownloadingService" />
-
-        <activity
-            android:name="com.umeng.update.UpdateDialogActivity"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
     </application>
 
 </manifest>

@@ -23,6 +23,8 @@ public class MyApplication extends Application {
     public static final String WEATHER_URL = "http://apis.baidu.com/heweather/weather/";
     public static final String APIKEY = "4a3a9afa23e0c5e7bb85b37ed53ed9d3";
 
+    public static final String WEATHER_ICON_URL = "http://mr-zdy-shanghai.oss-cn-shanghai.aliyuncs.com/weather_icon_white/";
+
     @Override
     public void onCreate() {
         // TODO Auto-generated method stub

@@ -21,8 +21,7 @@
         android:layout_height="48dp"
         android:layout_below="@id/huge_future_weather_day1_date"
         android:layout_marginTop="4dp"
-        android:padding="4dp"
-        android:src="@drawable/cloudy_pencil" />
+        android:padding="4dp"/>
 
     <TextView
         android:id="@+id/huge_future_weather_day1_weather"

@@ -484,48 +484,7 @@ public class WeatherFragment extends Fragment {
         return Color.rgb(red, green, blue);
     }
 
-    @SuppressWarnings("unused")
-    private void changeWeatherPicture(int kind, View view) {
-        switch (kind) {
-            case 0:
-                ((ImageView) view).setImageResource(R.drawable.sunny_pencil_grey);
-                break;
-            case 1:
-                ((ImageView) view).setImageResource(R.drawable.cloudy_pencil_grey);
-                break;
-            case 2:
-                ((ImageView) view).setImageResource(R.drawable.overcast_pencil_grey);
-                break;
-            case 4:
-            case 5:
-                ((ImageView) view).setImageResource(R.drawable.storm_pencil_grey);
-                break;
-            case 3:
-            case 7:
-            case 8:
-            case 9:
-            case 10:
-            case 11:
-            case 12:
-            case 21:
-            case 22:
-            case 23:
-            case 24:
-            case 25:
-                ((ImageView) view).setImageResource(R.drawable.rain_pencil_grey);
-                break;
-            case 13:
-            case 14:
-            case 15:
-            case 16:
-            case 17:
-            case 26:
-            case 27:
-            case 28:
-                ((ImageView) view).setImageResource(R.drawable.snow_pencil_grey);
-                break;
-        }
-    }
+
 
     @Override
     public void onAttach(Activity activity) {

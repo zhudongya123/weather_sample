@@ -21,8 +21,7 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginRight="10dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/cloudy_pencil" />
+            android:scaleType="fitCenter" />
 
         <TextView
             android:id="@+id/small_city"
@@ -32,7 +31,7 @@
             android:gravity="right"
             android:maxLines="1"
             android:paddingTop="4dp"
-            android:text="苏州"
+            android:text="@string/no_data"
             android:textColor="#FFFFFF"
             android:textSize="14sp" />
 
@@ -45,7 +44,7 @@
             android:gravity="right"
             android:maxLines="1"
             android:paddingBottom="4dp"
-            android:text="25°"
+            android:text="@string/no_data"
             android:textColor="#FFFFFF"
             android:textSize="12sp" />
 
@@ -57,7 +56,7 @@
             android:layout_toRightOf="@id/small_city"
             android:maxLines="1"
             android:paddingTop="4dp"
-            android:text="多云"
+            android:text="@string/no_data"
             android:textColor="#FFFFFF"
             android:textSize="14sp" />
 
@@ -69,7 +68,7 @@
             android:layout_alignLeft="@id/small_weather"
             android:maxLines="1"
             android:paddingBottom="4dp"
-            android:text="18:56更新"
+            android:text="@string/no_data"
             android:textColor="#FFFFFF"
             android:textSize="12sp" />
 

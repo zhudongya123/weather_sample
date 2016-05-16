@@ -3,11 +3,14 @@ package com.stu.zdy.weather.ui;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Build;
@@ -31,9 +34,15 @@ import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.RemoteViews;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.stu.zdy.weather.app.MyApplication;
+import com.stu.zdy.weather.appwidget.HugeWeatherWidget;
 import com.stu.zdy.weather.data.DBManager;
 import com.stu.zdy.weather.interfaces.FragmentCallBack;
 import com.stu.zdy.weather.open_source.Ldrawer.ActionBarDrawerToggle;
@@ -50,7 +59,6 @@ import com.stu.zdy.weather.util.ScreenUtils;
 import com.stu.zdy.weather.view.MyFragmentPagerAdapter;
 import com.stu.zdy.weather_sample.R;
 import com.umeng.analytics.MobclickAgent;
-import com.umeng.update.UmengUpdateAgent;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -125,7 +133,6 @@ public class MainActivity extends ActionBarActivity implements FragmentCallBack 
         }
 
         MobclickAgent.onPageStart(WeatherFragment.TAG);
-        UmengUpdateAgent.update(this);
     }
 
     /**
@@ -411,60 +418,19 @@ public class MainActivity extends ActionBarActivity implements FragmentCallBack 
     }
 
 
-    private void changeWeatherPicture(int kind, ImageView view) {
-        switch (kind) {
-            case 100:
-            case 102:
-            case 103:
-                view.setImageResource(R.drawable.sunny_pencil);
-                break;
-            case 101:
-                view.setImageResource(R.drawable.cloudy_pencil);
-                break;
-            case 104:
-                view.setImageResource(R.drawable.overcast_pencil);
-                break;
-            case 302:
-            case 303:
-            case 304:
-                view.setImageResource(R.drawable.storm_pencil);
-                break;
-            case 300:
-            case 301:
-            case 305:
-            case 306:
-            case 307:
-            case 308:
-            case 309:
-            case 310:
-            case 311:
-            case 312:
-            case 313:
-                view.setImageResource(R.drawable.rain_pencil);
-                break;
-            case 400:
-            case 401:
-            case 402:
-            case 403:
-            case 404:
-            case 405:
-            case 406:
-            case 407:
-                view.setImageResource(R.drawable.snow_pencil);
-                break;
-            default:
-                break;
-        }
-    }
+    private void changeWeatherPicture(int kind, final ImageView view) {
+        final Context context = this;
+        final RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_huge);
+        Glide.with(context).load(MyApplication.WEATHER_ICON_URL + kind + ".png").asBitmap().into(new SimpleTarget<Bitmap>() {
+            @Override
+            public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                view.setImageBitmap(resource);
+                ComponentName thisWidget = new ComponentName(context, HugeWeatherWidget.class);
+                AppWidgetManager.getInstance(context).updateAppWidget(thisWidget, views);
+            }
+        });
 
 
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-        try {
-            mDrawerToggle.syncState();
-        } catch (Exception e) {
-        }
     }
 
     @Override
