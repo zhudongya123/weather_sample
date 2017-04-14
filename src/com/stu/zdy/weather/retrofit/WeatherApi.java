@@ -11,7 +11,6 @@ import rx.Observable;
  * Created by Zdy on 2016/4/18.
  */
 public interface WeatherApi {
-    @Headers("apikey: 4a3a9afa23e0c5e7bb85b37ed53ed9d3")
-    @GET("free")
-    Observable<JsonObject> info(@Query("cityid") String id);
+    @GET("v5/weather")
+    Observable<JsonObject> info(@Query("city") String id, @Query("key") String key);
 }

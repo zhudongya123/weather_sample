@@ -1,8 +1,5 @@
 package com.stu.zdy.weather.ui;
 
-import android.app.Fragment;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Context;
@@ -16,11 +13,14 @@ import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.DrawerLayout.DrawerListener;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -68,7 +68,7 @@ import java.util.Hashtable;
 
 import static com.stu.zdy.weather.util.FileUtils.getCityFromJsonArray;
 
-public class MainActivity extends ActionBarActivity implements FragmentCallBack {
+public class MainActivity extends AppCompatActivity implements FragmentCallBack {
 
     private Context mContext;
     private DrawerLayout mDrawerLayout;// 抽屉布局
@@ -108,7 +108,9 @@ public class MainActivity extends ActionBarActivity implements FragmentCallBack 
         toolBar.setTitleTextColor(getResources().getColor(R.color.white_100));
         setSupportActionBar(toolBar);
         setScreenParameter();
-        fragmentManager = getFragmentManager();
+
+
+        fragmentManager = getSupportFragmentManager();
         fragmentTransaction = fragmentManager.beginTransaction();
         initUI();
         initDrawer();

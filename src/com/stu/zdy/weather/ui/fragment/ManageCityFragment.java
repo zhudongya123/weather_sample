@@ -1,7 +1,8 @@
 package com.stu.zdy.weather.ui.fragment;
 
 import android.app.Activity;
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
+import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -141,9 +142,9 @@ public class ManageCityFragment extends Fragment {
     }
 
     @Override
-    public void onAttach(Activity activity) {// 启动Fragment调用
-        super.onAttach(activity);
-        fragmentCallBack = (MainActivity) activity;// 将Activity实例赋给fragmentCallBack
+    public void onAttach(Context context) {// 启动Fragment调用
+        super.onAttach(context);
+        fragmentCallBack = (MainActivity) context;// 将Activity实例赋给fragmentCallBack
     }
 
     class DeleteCityOnClickListener implements View.OnClickListener {

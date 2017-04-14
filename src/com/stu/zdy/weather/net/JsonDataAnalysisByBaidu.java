@@ -31,7 +31,7 @@ public class JsonDataAnalysisByBaidu {
 			return;
 		}
 		try {
-			if (jsonObject.getJSONArray("HeWeather data service 3.0").getJSONObject(0).getString("status")
+			if (jsonObject.getJSONArray("HeWeather5").getJSONObject(0).getString("status")
 					.equals("ok")) {
 				analysisData();
 			} else {
@@ -52,23 +52,23 @@ public class JsonDataAnalysisByBaidu {
 	 */
 	private void analysisData() throws JSONException {
 
-		JSONObject basic = jsonObject.getJSONArray("HeWeather data service 3.0").getJSONObject(0)
+		JSONObject basic = jsonObject.getJSONArray("HeWeather5").getJSONObject(0)
 				.getJSONObject("basic");
 
 		ArrayList<String> item1 = new ArrayList<String>();
 		item1.add(basic.getString("city"));// 城市名
 		item1.add(basic.getString("id"));// 城市id
 		item1.add(basic.getJSONObject("update").getString("loc").substring(11));// 更新时间
-		JSONObject now = jsonObject.getJSONArray("HeWeather data service 3.0").getJSONObject(0).getJSONObject("now");// 实况天气
+		JSONObject now = jsonObject.getJSONArray("HeWeather5").getJSONObject(0).getJSONObject("now");// 实况天气
 		item1.add(now.getJSONObject("cond").getString("txt"));// 当前天气描述
 		item1.add(now.getString("hum"));// 湿度
 		item1.add(now.getJSONObject("wind").getString("dir") + now.getJSONObject("wind").getString("sc") + "级");// 当前风力风向
 		item1.add(now.getString("tmp"));// 当前温度
 		item1.add(now.getJSONObject("cond").getString("code"));// 当前天气状况代码
-		item1.add(jsonObject.getJSONArray("HeWeather data service 3.0").getJSONObject(0).getJSONObject("suggestion")
+		item1.add(jsonObject.getJSONArray("HeWeather5").getJSONObject(0).getJSONObject("suggestion")
 				.getJSONObject("uv").getString("brf"));// 紫外线强度
 
-		JSONArray daily_forcast = jsonObject.getJSONArray("HeWeather data service 3.0").getJSONObject(0)
+		JSONArray daily_forcast = jsonObject.getJSONArray("HeWeather5").getJSONObject(0)
 				.getJSONArray("daily_forecast");// 未来天气预报
 
 		ArrayList<String> item2 = new ArrayList<String>();
@@ -84,7 +84,7 @@ public class JsonDataAnalysisByBaidu {
 			item2.add(10 + i, daily_forcast.getJSONObject(i).getJSONObject("cond").getString("code_d"));// 未来五天白天天气状况代码
 		}
 
-		JSONArray hourly_forecast = jsonObject.getJSONArray("HeWeather data service 3.0").getJSONObject(0)
+		JSONArray hourly_forecast = jsonObject.getJSONArray("HeWeather5").getJSONObject(0)
 				.getJSONArray("hourly_forecast");// 未来三小时天气预报
 
 		ArrayList<String> item3 = new ArrayList<String>();
@@ -93,7 +93,7 @@ public class JsonDataAnalysisByBaidu {
 			item3.add(hourly_forecast.getJSONObject(i).getString("tmp"));// 温度
 		}
 
-		JSONObject suggestion = jsonObject.getJSONArray("HeWeather data service 3.0").getJSONObject(0)
+		JSONObject suggestion = jsonObject.getJSONArray("HeWeather5").getJSONObject(0)
 				.getJSONObject("suggestion");
 		ArrayList<String> item4 = new ArrayList<String>();
 		item4.add(suggestion.getJSONObject("comf").getString("txt"));// 舒适度描述
@@ -102,7 +102,7 @@ public class JsonDataAnalysisByBaidu {
 		item4.add(suggestion.getJSONObject("trav").getString("brf"));// 出行指数
 
 		try {
-			JSONObject aqi = jsonObject.getJSONArray("HeWeather data service 3.0").getJSONObject(0)
+			JSONObject aqi = jsonObject.getJSONArray("HeWeather5").getJSONObject(0)
 					.getJSONObject("aqi");
 			ArrayList<String> item5 = new ArrayList<String>();
 			item5.add(aqi.getJSONObject("city").getString("aqi"));
